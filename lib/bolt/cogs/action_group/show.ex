@@ -27,7 +27,7 @@ defmodule Bolt.Cogs.ActionGroup.Show do
   def command(msg, [name]) do
     case Actions.get_guild_group(msg.guild_id, name) do
       nil ->
-        Api.create_message!(msg.channel_id,
+        {:ok, _msg} = Api.Message.create(msg.channel_id,
           content: "🚫 no action group named `#{name}` found",
           allowed_mentions: :none
         )
@@ -40,7 +40,7 @@ defmodule Bolt.Cogs.ActionGroup.Show do
 
   def command(msg, _args) do
     response = "ℹ️ usage: `#{hd(usage())}`"
-    Api.create_message!(msg.channel_id, response)
+    {:ok, _msg} = Api.Message.create(msg.channel_id, response)
   end
 
   defp build_action_group_embed(group) do

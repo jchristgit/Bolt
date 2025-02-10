@@ -4,7 +4,7 @@ defmodule Bolt.Cogs.Stats do
   @behaviour Nosedrum.TextCommand
 
   alias Bolt.Constants
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Cache.Me
   alias Nostrum.Struct.Embed
   alias Nostrum.Struct.Embed.{Field, Footer, Image, Thumbnail}
@@ -57,11 +57,11 @@ defmodule Bolt.Cogs.Stats do
       }
     }
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, embed: response)
+    {:ok, _msg} = Message.create(msg.channel_id, embed: response)
   end
 
   def command(msg, _unknown_args) do
     response = "ℹ️ usage: `stats`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

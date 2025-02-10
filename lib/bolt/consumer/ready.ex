@@ -4,7 +4,7 @@ defmodule Bolt.Consumer.Ready do
   alias Bolt.BotLog
   alias Bolt.Cogs
   alias Nosedrum.TextCommand.Storage.ETS, as: CommandStorage
-  alias Nostrum.Api
+  alias Nostrum.Api.Self
   require Logger
 
   @infraction_group %{
@@ -150,7 +150,7 @@ defmodule Bolt.Consumer.Ready do
     :ok = load_commands()
     BotLog.emit("⚡ Logged in and ready, seeing `#{length(data.guilds)}` guilds.")
     prefix = Application.fetch_env!(:bolt, :prefix)
-    :ok = Api.update_status(:online, "you | #{prefix}help", 3)
+    :ok = Self.update_status(:online, {:watching, "you | #{prefix}help"})
     :systemd.notify(:ready)
   end
 

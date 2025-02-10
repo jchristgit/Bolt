@@ -5,7 +5,7 @@ defmodule Bolt.Cogs.GuildInfo do
 
   alias Bolt.{Constants, Helpers}
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Cache.GuildCache
   alias Nostrum.Snowflake
   alias Nostrum.Struct.{Embed, Guild}
@@ -78,19 +78,11 @@ defmodule Bolt.Cogs.GuildInfo do
         format_guild_info(guild)
 
       {:error, _reason} ->
-        case Api.get_guild(guild_id) do
-          {:ok, guild} ->
-            format_guild_info(guild)
-
-          {:error, _reason} ->
-            %Embed{
-              title: "Failed to fetch guild information",
-              description:
-                "#{on_not_found} was not found in the cache nor " <>
-                  "could any information be fetched from the API.",
-              color: Constants.color_red()
-            }
-        end
+        %Embed{
+          title: "Failed to fetch guild information",
+          description: "#{on_not_found} was not found in the cache. sorry! :-(",
+          color: Constants.color_red()
+        }
     end
   end
 
@@ -110,23 +102,23 @@ defmodule Bolt.Cogs.GuildInfo do
   @impl true
   def command(msg, []) do
     embed = fetch_and_build(msg.guild_id, "This guild")
-    {:ok, _msg} = Api.create_message(msg.channel_id, embed: embed)
+    {:ok, _msg} = Message.create(msg.channel_id, embed: embed)
   end
 
   def command(msg, [guild_id]) do
     case Snowflake.cast(guild_id) do
       {:ok, snowflake} when snowflake != nil ->
         embed = fetch_and_build(snowflake, "A guild with ID `#{snowflake}`")
-        {:ok, _msg} = Api.create_message(msg.channel_id, embed: embed)
+        {:ok, _msg} = Message.create(msg.channel_id, embed: embed)
 
       _ ->
         response = "🚫 `#{Helpers.clean_content(guild_id)}` is not a valid guild ID"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
     end
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `guildinfo [guild:snowflake]`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

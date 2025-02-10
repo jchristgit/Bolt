@@ -81,7 +81,7 @@ defmodule Bolt.Cogs.Clean do
            parse_channel(msg.guild_id, options[:channel], msg.channel_id),
          limit <- min(Keyword.get(options, :limit, 100), 1000),
          {:ok, messages} when messages != [] <-
-           Api.get_channel_messages(target_channel_id, limit, {:before, msg.id}),
+           Api.Channel.messages(target_channel_id, limit, {:before, msg.id}),
          {:ok, message_stream} <- apply_filter(messages, :bots, options[:bots], msg.guild_id),
          {:ok, message_stream} <-
            apply_filter(message_stream, :user, options[:user], msg.guild_id),
@@ -90,8 +90,8 @@ defmodule Bolt.Cogs.Clean do
          false <- Enum.empty?(message_stream),
          messages_to_delete <- Enum.to_list(message_stream),
          message_ids <- Enum.map(messages_to_delete, & &1.id),
-         {:ok} <- Api.bulk_delete_messages(msg.channel_id, message_ids) do
-      Api.create_reaction(msg.channel_id, msg.id, "👌")
+         {:ok} <- Api.Channel.bulk_delete_messages(msg.channel_id, message_ids) do
+      Api.Message.react(msg.channel_id, msg.id, "👌")
 
       log_content =
         messages_to_delete
@@ -115,17 +115,17 @@ defmodule Bolt.Cogs.Clean do
       {:ok, []} ->
         # No messages returned from the API call
         response = "🚫 no messages found, does the bot have `READ_MESSAGE_HISTORY` "
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Api.Message.create(msg.channel_id, response)
 
       # `message_stream` is empty
       true ->
         # No messages found after filter application
         response = "🚫 no messages found matching the given options"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Api.Message.create(msg.channel_id, response)
 
       error ->
         response = ErrorFormatters.fmt(msg, error)
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Api.Message.create(msg.channel_id, response)
     end
   end
 
@@ -134,7 +134,7 @@ defmodule Bolt.Cogs.Clean do
       "ℹ️ usage: `#{List.first(usage())}` or `#{List.last(usage())}`, " <>
         "see `help clean` for options"
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Api.Message.create(msg.channel_id, response)
   end
 
   def command(msg, {[], [maybe_amount | []], []}) do
@@ -146,13 +146,13 @@ defmodule Bolt.Cogs.Clean do
         response =
           "🚫 expected options or limit to prune as sole argument, " <> "see `help clean` for help"
 
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Api.Message.create(msg.channel_id, response)
     end
   end
 
   def command(msg, {[], [_maybe_amount | _unrecognized_args], []}) do
     {:ok, _msg} =
-      Api.create_message(
+      Api.Message.create(
         msg.channel_id,
         "🚫 expected the message limit as the sole argument, but got some other unrecognized args"
       )
@@ -160,7 +160,7 @@ defmodule Bolt.Cogs.Clean do
 
   def command(msg, {options, args, []}) when options != [] and args != [] do
     {:ok, _msg} =
-      Api.create_message(
+      Api.Message.create(
         msg.channel_id,
         "🚫 expected either a sole argument (amount to delete) or exact options, got both"
       )
@@ -170,7 +170,7 @@ defmodule Bolt.Cogs.Clean do
     invalid_args = Parsers.describe_invalid_args(invalid)
 
     {:ok, _msg} =
-      Api.create_message(
+      Api.Message.create(
         msg.channel_id,
         "🚫 unrecognized argument(s) or invalid value: #{invalid_args}"
       )

@@ -120,7 +120,7 @@ defmodule Bolt.Cogs.Assign do
     else
       with {:ok, member} <- MemberCache.get(msg.guild_id, msg.author.id),
            {:ok, _member} <-
-             Api.modify_guild_member(msg.guild_id, msg.author.id,
+             Api.Guild.modify_member(msg.guild_id, msg.author.id,
                roles: Enum.uniq(member.roles ++ Enum.map(selected_self_assignable_roles, & &1.id))
              ) do
         added_role_list =
