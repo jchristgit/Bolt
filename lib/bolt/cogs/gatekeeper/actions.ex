@@ -63,7 +63,7 @@ defmodule Bolt.Cogs.GateKeeper.Actions do
       |> put_actions("join actions", join_actions)
       |> put_empty_description("Hmm, seems like there's nothing here yet.")
 
-    {:ok, _msg} = Api.create_message(channel_id, embed: embed)
+    {:ok, _msg} = Api.Message.create(channel_id, embed: embed)
   end
 
   @spec actions_for_guild(Guild.id(), :accept | :join) :: Ecto.Query.t()
@@ -102,6 +102,6 @@ defmodule Bolt.Cogs.GateKeeper.Actions do
 
   def command(msg, _args) do
     response = "ℹ️ usage: `#{usage()}`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Api.Message.create(msg.channel_id, response)
   end
 end

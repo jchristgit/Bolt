@@ -7,7 +7,7 @@ defmodule Bolt.Cogs.Tag.Info do
   alias Bolt.Schema.Tag
   alias Bolt.{Helpers, Repo}
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Cache.MemberCache
   alias Nostrum.Struct.{Embed, User}
   import Ecto.Query, only: [from: 2]
@@ -28,7 +28,7 @@ defmodule Bolt.Cogs.Tag.Info do
   @impl true
   def command(msg, "") do
     response = "ℹ️ usage: `tag info <name:str...>`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, name) do
@@ -44,7 +44,7 @@ defmodule Bolt.Cogs.Tag.Info do
     case Repo.all(query) do
       [] ->
         response = "🚫 no tag with that name found"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
 
       [tag] ->
         creator_string =
@@ -79,7 +79,7 @@ defmodule Bolt.Cogs.Tag.Info do
           ]
         }
 
-        {:ok, _msg} = Api.create_message(msg.channel_id, embed: embed)
+        {:ok, _msg} = Message.create(msg.channel_id, embed: embed)
     end
   end
 end

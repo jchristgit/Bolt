@@ -6,7 +6,7 @@ defmodule Bolt.Cogs.Role.Mute do
   alias Bolt.{ErrorFormatters, ModLog, Repo}
   alias Nosedrum.Converters
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Cache.GuildCache
   alias Nostrum.Struct.User
 
@@ -53,7 +53,7 @@ defmodule Bolt.Cogs.Role.Mute do
           ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, ["delete"]) do
@@ -72,7 +72,7 @@ defmodule Bolt.Cogs.Role.Mute do
         error -> ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, role_str_list) do
@@ -101,6 +101,6 @@ defmodule Bolt.Cogs.Role.Mute do
         error -> ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

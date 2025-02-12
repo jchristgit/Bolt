@@ -5,7 +5,7 @@ defmodule Bolt.Cogs.ModLog.Explain do
 
   alias Bolt.{Constants, Helpers}
   alias Bolt.Schema.ModLogConfig
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.Embed
 
   @event_map %{
@@ -74,7 +74,7 @@ defmodule Bolt.Cogs.ModLog.Explain do
             "🚫 unknown event `#{Helpers.clean_content(event_name)}`"
           end
 
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
 
       description ->
         embed = %Embed{
@@ -83,12 +83,12 @@ defmodule Bolt.Cogs.ModLog.Explain do
           color: Constants.color_blue()
         }
 
-        {:ok, _msg} = Api.create_message(msg.channel_id, embed: embed)
+        {:ok, _msg} = Message.create(msg.channel_id, embed: embed)
     end
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `modlog explain <event:str>`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

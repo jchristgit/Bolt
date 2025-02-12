@@ -4,7 +4,7 @@ defmodule Bolt.Cogs.Tempmute do
 
   alias Bolt.Moderation
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   import Bolt.Parsers, only: [human_future_date: 1]
   import Bolt.Helpers, only: [datetime_to_human: 1]
 
@@ -40,18 +40,18 @@ defmodule Bolt.Cogs.Tempmute do
       response =
         "👌 timed out #{user_string} until #{datetime_to_human(expiry)} (##{infraction.id})"
 
-      Api.create_message!(msg.channel_id, response)
+      {:ok, _msg} = Message.create(msg.channel_id, response)
     else
       {:error, response, _user} ->
-        Api.create_message!(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
 
       {:error, response} ->
-        Api.create_message!(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
     end
   end
 
   def command(msg, _args) do
     response = "ℹ️  usage: `#{List.first(usage())}`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

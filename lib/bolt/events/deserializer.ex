@@ -5,7 +5,7 @@ defmodule Bolt.Events.Deserializer do
   alias Bolt.ModLog
   alias Bolt.Repo
   alias Bolt.Schema.Infraction
-  alias Nostrum.Api
+  alias Nostrum.Api.Guild
   require Logger
 
   @spec deserialize(Infraction) :: (() -> any())
@@ -20,7 +20,7 @@ defmodule Bolt.Events.Deserializer do
       human_role = Humanizer.human_role(guild_id, role_id)
       human_user = Humanizer.human_user(user_id)
 
-      case Api.remove_guild_member_role(guild_id, user_id, role_id) do
+      case Guild.remove_member_role(guild_id, user_id, role_id) do
         {:ok} ->
           ModLog.emit(
             guild_id,
@@ -56,7 +56,7 @@ defmodule Bolt.Events.Deserializer do
     func = fn ->
       human_user = Humanizer.human_user(user_id)
 
-      case Api.remove_guild_ban(guild_id, user_id) do
+      case Guild.unban_member(guild_id, user_id) do
         {:ok} ->
           ModLog.emit(
             guild_id,
@@ -108,7 +108,7 @@ defmodule Bolt.Events.Deserializer do
       human_user = Humanizer.human_user(user_id)
 
       modlog_message =
-        case Api.remove_guild_member_role(guild_id, user_id, mute_role_id) do
+        case Guild.remove_member_role(guild_id, user_id, mute_role_id) do
           {:ok} ->
             "user #{human_user} was unmuted (##{infraction_id})"
 

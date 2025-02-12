@@ -52,7 +52,7 @@ defmodule Bolt.Moderation do
          # Okay, technically it isn't permanent, but by that time humanity
          # will either be eradicated or has found better problems anyways, so
          {:ok, _member} <-
-           Api.modify_guild_member(guild_id, target_id, communication_disabled_until: expiry),
+           Api.Guild.modify_member(guild_id, target_id, communication_disabled_until: expiry),
          changeset <- Infraction.changeset(%Infraction{}, infraction),
          {:ok, created_infraction} <- Repo.insert(changeset) do
       user_string = Humanizer.human_user(converted_user || target_id)
@@ -111,7 +111,7 @@ defmodule Bolt.Moderation do
            reason: if(reason != "", do: reason, else: nil)
          },
          {:ok, true} <- Helpers.above?(guild_id, actor.id, target_id),
-         {:ok} <- Api.create_guild_ban(guild_id, target_id, 7),
+         {:ok} <- Api.Guild.ban_member(guild_id, target_id, 7),
          changeset <- Infraction.changeset(%Infraction{}, infraction),
          {:ok, created_infraction} <- Repo.insert(changeset) do
       user_string = Humanizer.human_user(converted_user || target_id)

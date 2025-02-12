@@ -7,7 +7,7 @@ defmodule Bolt.Cogs.Infraction.Detail do
   alias Nosedrum.TextCommand.Predicates
   alias Bolt.{Constants, Helpers, Humanizer, Repo}
   alias Bolt.Schema.Infraction
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.Embed
   alias Nostrum.Struct.Embed.{Field, Footer}
 
@@ -139,20 +139,20 @@ defmodule Bolt.Cogs.Infraction.Detail do
          infraction when infraction != nil <-
            Repo.get_by(Infraction, id: id, guild_id: msg.guild_id) do
       embed = format_detail(infraction)
-      {:ok, _msg} = Api.create_message(msg.channel_id, embed: embed)
+      {:ok, _msg} = Message.create(msg.channel_id, embed: embed)
     else
       nil ->
         response = "🚫 no infraction with the given ID found"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
 
       :error ->
         response = "🚫 expected an integer (ID to look up), but that is not a valid integer"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
     end
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `infraction detail <id:int>`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

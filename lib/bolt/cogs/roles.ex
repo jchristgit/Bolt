@@ -5,7 +5,7 @@ defmodule Bolt.Cogs.Roles do
 
   alias Bolt.{Constants, Helpers, Paginator}
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Cache.GuildCache
   alias Nostrum.Struct.Embed
   alias Nostrum.Struct.Guild.Role
@@ -86,7 +86,7 @@ defmodule Bolt.Cogs.Roles do
 
         {:error, reason} ->
           response = "❌ could not fetch guild roles: #{Helpers.clean_content(reason)}"
-          {:ok, _msg} = Api.create_message(msg.channel_id, response)
+          {:ok, _msg} = Message.create(msg.channel_id, response)
       end
     else
       "🚫 unknown sort order, use `members`, `name`, or `position`"
@@ -106,7 +106,7 @@ defmodule Bolt.Cogs.Roles do
       |> Helpers.clean_content()
 
     {:ok, _msg} =
-      Api.create_message(
+      Message.create(
         msg.channel_id,
         "🚫 unrecognized argument(s) or invalid value: #{description}"
       )
@@ -114,7 +114,7 @@ defmodule Bolt.Cogs.Roles do
 
   def command(msg, _args) do
     response = "ℹ️ usage: `#{List.first(usage())}`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   @spec sort_key(sort_by :: String.t(), role :: Role.t(), guild_id :: Guild.id()) ::

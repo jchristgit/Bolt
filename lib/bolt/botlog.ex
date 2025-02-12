@@ -9,7 +9,7 @@ defmodule Bolt.BotLog do
     case Application.fetch_env(:bolt, :botlog_channel) do
       {:ok, channel_id} when channel_id != nil ->
         {actual_id, _} = Integer.parse(channel_id)
-        {:ok, _msg} = Api.create_message(actual_id, content)
+        {:ok, _msg} = Api.Message.create(actual_id, content)
 
       _ ->
         :noop

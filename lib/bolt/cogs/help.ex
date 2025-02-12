@@ -5,9 +5,9 @@ defmodule Bolt.Cogs.Help do
 
   alias Bolt.{Constants, Helpers}
   alias Nosedrum.TextCommand.Storage.ETS, as: CommandStorage
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.Embed
-  alias Nostrum.Struct.Message
+  alias Nostrum.Struct
 
   @spec prefix() :: String.t()
   defp prefix, do: Application.fetch_env!(:bolt, :prefix)
@@ -51,8 +51,8 @@ defmodule Bolt.Cogs.Help do
   end
 
   @impl true
-  def command(%Message{channel_id: channel_id, content: ".man"}, []) do
-    Api.create_message!(channel_id, "What manual page do you want?")
+  def command(%Struct.Message{channel_id: channel_id, content: ".man"}, []) do
+    {:ok, _msg} = Message.create(channel_id, "What manual page do you want?")
   end
 
   def command(msg, []) do
@@ -75,18 +75,18 @@ defmodule Bolt.Cogs.Help do
       color: Constants.color_blue()
     }
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, embed: embed)
+    {:ok, _msg} = Message.create(msg.channel_id, embed: embed)
   end
 
   def command(msg, [command_name]) do
     case CommandStorage.lookup_command(command_name) do
       nil ->
         response = "🚫 unknown command, check `help` to view all"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
 
       command_module when not is_map(command_module) ->
         embed = format_command_detail(command_name, command_module)
-        {:ok, _msg} = Api.create_message(msg.channel_id, embed: embed)
+        {:ok, _msg} = Message.create(msg.channel_id, embed: embed)
 
       subcommand_map ->
         embed =
@@ -110,7 +110,7 @@ defmodule Bolt.Cogs.Help do
             }
           end
 
-        {:ok, _msg} = Api.create_message(msg.channel_id, embed: embed)
+        {:ok, _msg} = Message.create(msg.channel_id, embed: embed)
     end
   end
 
@@ -120,7 +120,7 @@ defmodule Bolt.Cogs.Help do
         case Map.fetch(command_map, subcommand_name) do
           {:ok, command_module} ->
             embed = format_command_detail("#{command_group} #{subcommand_name}", command_module)
-            {:ok, _msg} = Api.create_message(msg.channel_id, embed: embed)
+            {:ok, _msg} = Message.create(msg.channel_id, embed: embed)
 
           :error ->
             subcommand_string =
@@ -130,19 +130,19 @@ defmodule Bolt.Cogs.Help do
               "🚫 unknown subcommand `#{Helpers.clean_content(subcommand_name)}`," <>
                 " known commands: #{subcommand_string}"
 
-            {:ok, _msg} = Api.create_message(msg.channel_id, response)
+            {:ok, _msg} = Message.create(msg.channel_id, response)
         end
 
       nil ->
         response = "🚫 no command group named `#{Helpers.clean_content(command_group)}` found"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
 
       _module ->
         response =
           "🚫 that command has no subcommands, use" <>
             " `help #{command_group}` for information on it"
 
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
     end
   end
 
@@ -150,6 +150,6 @@ defmodule Bolt.Cogs.Help do
     response =
       "ℹ️ usage: `help [command_name:str]` or `help [command_group:str] [subcommand_name:str]`"
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

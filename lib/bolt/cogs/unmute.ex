@@ -9,7 +9,8 @@ defmodule Bolt.Cogs.Unmute do
   alias Ecto.Changeset
   alias Nosedrum.Converters
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Guild
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.User
   import Ecto.Query, only: [from: 2]
 
@@ -39,7 +40,7 @@ defmodule Bolt.Cogs.Unmute do
              ),
            mute_infraction when mute_infraction != nil <- Repo.one(mute_query),
            {:ok, _modified_member} <-
-             Api.modify_guild_member(
+             Guild.modify_member(
                mute_infraction.guild_id,
                mute_infraction.user_id,
                communication_disabled_until: nil
@@ -61,12 +62,12 @@ defmodule Bolt.Cogs.Unmute do
           ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `#{List.first(usage())}`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   @spec expire_mute(Infraction) :: {:ok, Infraction} | {:error, String.t() | Changeset.t()}

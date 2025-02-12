@@ -2,10 +2,10 @@ defmodule Bolt.Helpers do
   @moduledoc "Various helpers used throughout the bot."
 
   alias Nosedrum.Converters
-  alias Nostrum.Api
+  alias Nostrum.Api.Guild
   alias Nostrum.Cache.GuildCache
   alias Nostrum.Cache.MemberCache
-  alias Nostrum.Struct.Guild
+  alias Nostrum.Struct
   alias Nostrum.Struct.Guild.{Member, Role}
   alias Nostrum.Struct.User
   require Logger
@@ -37,7 +37,7 @@ defmodule Bolt.Helpers do
 
   @doc "Try to return a member of the given guild ID with the given author ID."
   @spec get_member(
-          Guild.id(),
+          Struct.Guild.id(),
           User.id()
         ) :: {:ok, Member.t()} | {:error, String.t()}
   def get_member(guild_id, author_id) do
@@ -46,7 +46,7 @@ defmodule Bolt.Helpers do
         result
 
       {:error, _reason} ->
-        case Api.get_guild_member(guild_id, author_id) do
+        case Guild.member(guild_id, author_id) do
           {:ok, _member} = result -> result
           {:error, _why} -> {:error, "member not be found in cache nor via the API"}
         end
@@ -72,7 +72,7 @@ defmodule Bolt.Helpers do
 
   @doc "Returns the top role for the given member ID on the given guild, representative for permissions on the given guild ID."
   @spec top_role_for(
-          Guild.id(),
+          Struct.Guild.id(),
           User.id()
         ) :: {:ok, Role.t()} | {:error, String.t()}
   def top_role_for(guild_id, member_id) do
@@ -84,7 +84,7 @@ defmodule Bolt.Helpers do
 
           {:error, _reason} ->
             # credo:disable-for-next-line Credo.Check.Refactor.Nesting
-            case Api.get_guild_roles(guild_id) do
+            case Guild.roles(guild_id) do
               {:ok, roles} ->
                 find_role(roles, member.roles)
 
@@ -113,7 +113,7 @@ defmodule Bolt.Helpers do
   end
 
   @doc "Convert text into either a raw snowflake or a snowflake + member."
-  @spec into_id(Guild.id(), String.t()) ::
+  @spec into_id(Struct.Guild.id(), String.t()) ::
           {:ok, User.id(), User.t() | nil}
           | {:error, String.t()}
   def into_id(guild_id, text) do
@@ -130,7 +130,7 @@ defmodule Bolt.Helpers do
   end
 
   @doc "Checks that `actor_id`'s top role is above `target_id`s top role on `guild_id`."
-  @spec above?(Guild.id(), User.id(), User.id()) :: {:ok, true | false} | {:error, String.t()}
+  @spec above?(Struct.Guild.id(), User.id(), User.id()) :: {:ok, true | false} | {:error, String.t()}
   def above?(guild_id, actor_id, target_id) do
     case top_role_for(guild_id, actor_id) do
       {:ok, actor_top_role} ->

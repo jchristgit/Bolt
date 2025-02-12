@@ -7,7 +7,7 @@ defmodule Bolt.Cogs.ActionGroup.Create do
   alias Bolt.ErrorFormatters
   alias Bolt.ModLog
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   import Bolt.Humanizer, only: [human_user: 1]
 
   @impl true
@@ -35,16 +35,16 @@ defmodule Bolt.Cogs.ActionGroup.Create do
           "#{human_user(msg.author)} created action group `#{name}`"
         )
 
-        Api.create_message!(msg.channel_id, "👌 group created, use `ag add` to add actions")
+        {:ok, _msg} = Message.create(msg.channel_id, "👌 group created, use `ag add` to add actions")
 
       error ->
         response = ErrorFormatters.fmt(msg, error)
-        Api.create_message!(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
     end
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `#{hd(usage())}`"
-    Api.create_message!(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

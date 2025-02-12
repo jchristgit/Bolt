@@ -3,7 +3,7 @@ defmodule Bolt.Cogs.Ed do
 
   @behaviour Nosedrum.TextCommand
 
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
 
   @impl true
   def usage, do: ["ed [-GVhs] [-p string] [file]"]
@@ -17,6 +17,6 @@ defmodule Bolt.Cogs.Ed do
   @impl true
   def command(msg, _args) do
     {:ok, _msg} =
-      Api.create_message(msg.channel_id, content: "?", message_reference: %{message_id: msg.id})
+      Message.create(msg.channel_id, content: "?", message_reference: %{message_id: msg.id})
   end
 end

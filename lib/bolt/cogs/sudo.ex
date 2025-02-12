@@ -4,7 +4,7 @@ defmodule Bolt.Cogs.Sudo do
   @behaviour Nosedrum.TextCommand
 
   alias Bolt.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
 
   @impl true
   def usage, do: ["sudo ?"]
@@ -73,6 +73,6 @@ defmodule Bolt.Cogs.Sudo do
 
   def command(msg, _args) do
     response = "🚫 unknown subcommand"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

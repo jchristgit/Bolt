@@ -65,7 +65,7 @@ defmodule Bolt.ModLog do
             opts
           end
 
-        Api.create_message(channel_id, opts)
+        Api.Message.create(channel_id, opts)
 
       _other ->
         :noop

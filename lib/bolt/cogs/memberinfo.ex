@@ -6,7 +6,7 @@ defmodule Bolt.Cogs.MemberInfo do
   alias Bolt.Helpers
   alias Nosedrum.Converters
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Cache.MemberCache
   alias Nostrum.Cache.UserCache
   alias Nostrum.Snowflake
@@ -74,11 +74,11 @@ defmodule Bolt.Cogs.MemberInfo do
     case MemberCache.get(msg.guild_id, msg.author.id) do
       {:ok, member} ->
         embed = format_member_info(msg.guild_id, member)
-        {:ok, _msg} = Api.create_message(msg.channel_id, embed: embed)
+        {:ok, _msg} = Message.create(msg.channel_id, embed: embed)
 
       {:error, _reason} ->
         response = "❌ failed to find you in this guild's members - that's a bit weird"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
     end
   end
 
@@ -86,11 +86,11 @@ defmodule Bolt.Cogs.MemberInfo do
     case Converters.to_member(maybe_member, msg.guild_id) do
       {:ok, fetched_member} ->
         embed = format_member_info(msg.guild_id, fetched_member)
-        {:ok, _msg} = Api.create_message(msg.channel_id, embed: embed)
+        {:ok, _msg} = Message.create(msg.channel_id, embed: embed)
 
       {:error, reason} ->
         response = "❌ couldn't fetch member information: #{reason}"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
     end
   end
 end

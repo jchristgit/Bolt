@@ -6,7 +6,7 @@ defmodule Bolt.Cogs.ActionGroup.Trigger do
   alias Bolt.Actions
   alias Bolt.ModLog
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   import Bolt.Humanizer, only: [human_user: 1]
 
   @impl true
@@ -28,7 +28,7 @@ defmodule Bolt.Cogs.ActionGroup.Trigger do
   def command(msg, [name]) do
     case Actions.get_guild_group(msg.guild_id, name) do
       nil ->
-        Api.create_message!(msg.channel_id,
+        {:ok, _msg} = Message.create(msg.channel_id,
           content: "🚫 no action group named `#{name}` found",
           allowed_mentions: :none
         )
@@ -53,14 +53,14 @@ defmodule Bolt.Cogs.ActionGroup.Trigger do
 
   def command(msg, _args) do
     response = "ℹ️ usage: `#{hd(usage())}`"
-    Api.create_message!(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   defp report_run_result(:aborted, channel_id) do
-    Api.create_message!(channel_id, content: "⚠️ run aborted due to deduplication")
+    {:ok, _msg} = Message.create(channel_id, content: "⚠️ run aborted due to deduplication")
   end
 
   defp report_run_result(_result, channel_id) do
-    Api.create_message!(channel_id, content: "👌 action group run done")
+    {:ok, _msg} = Message.create(channel_id, content: "👌 action group run done")
   end
 end

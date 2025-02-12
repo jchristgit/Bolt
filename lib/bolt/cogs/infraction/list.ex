@@ -82,7 +82,7 @@ defmodule Bolt.Cogs.Infraction.List do
 
   def command(msg, _args) do
     response = "ℹ️ usage: `infr list [--automod|--no-automod]`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Api.Message.create(msg.channel_id, response)
   end
 
   @spec respond(Ecto.Query.t(), Message.t(), String.t()) :: {:ok, Message.t()}

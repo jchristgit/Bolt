@@ -5,13 +5,14 @@ defmodule Bolt.Cogs.Tag.Read do
   alias Bolt.Helpers
   alias Bolt.Repo
   alias Bolt.Schema.Tag
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
+  alias Nostrum.Struct
   alias Nostrum.Struct.Embed
   alias Nostrum.Struct.Embed.Footer
-  alias Nostrum.Struct.{Message, User}
+  alias Nostrum.Struct.User
   import Ecto.Query, only: [from: 2]
 
-  @spec command(Message.t(), [String.t()]) :: {:ok, Message.t()}
+  @spec command(Struct.Message.t(), [String.t()]) :: {:ok, Message.t()}
   def command(msg, args) when args != [] do
     # We downcase it here since although the database type is the
     # case-insensitive `citext`, `levenshtein` function does not
@@ -36,7 +37,7 @@ defmodule Bolt.Cogs.Tag.Read do
           "❌ no tag named exactly as or similarly to " <>
             "`#{Helpers.clean_content(name)}` found"
 
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
 
       # Direct match.
       [{matching_tag, 0 = _distance} | _] ->
@@ -48,7 +49,7 @@ defmodule Bolt.Cogs.Tag.Read do
           footer: build_footer(msg.guild_id, matching_tag.author_id)
         }
 
-        {:ok, _msg} = Api.create_message(msg.channel_id, embed: response)
+        {:ok, _msg} = Message.create(msg.channel_id, embed: response)
 
       # Collection of close matches, bt no direct match.
       close_matches ->
@@ -63,7 +64,7 @@ defmodule Bolt.Cogs.Tag.Read do
         #{joined_names}
         """
 
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
     end
   end
 
@@ -72,7 +73,7 @@ defmodule Bolt.Cogs.Tag.Read do
       "ℹ usage: `tag <name:str>` or `tag <subcommand>" <>
         " [args...]`, see `help tag` for details"
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   @spec build_footer(Guild.id(), User.id()) :: Footer.t()

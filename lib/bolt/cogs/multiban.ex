@@ -5,7 +5,7 @@ defmodule Bolt.Cogs.MultiBan do
   alias Bolt.Cogs.Ban
   alias Bolt.Helpers
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
 
   @impl true
   def usage,
@@ -50,7 +50,7 @@ defmodule Bolt.Cogs.MultiBan do
 
   def command(msg, []) do
     response = "ℹ️ usage: `multiban [reason:str] <user:snowflake|member...>`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   defp multiban(user_ids, msg, reason \\ "") do

@@ -5,7 +5,7 @@ defmodule Bolt.Cogs.ModLog.Events do
 
   alias Bolt.{Constants, Paginator}
   alias Bolt.Schema.ModLogConfig
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.Embed
 
   @impl true
@@ -44,6 +44,6 @@ defmodule Bolt.Cogs.ModLog.Events do
 
   def command(msg, _args) do
     response = "ℹ️ usage: `modlog events`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

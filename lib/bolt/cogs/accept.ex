@@ -7,7 +7,8 @@ defmodule Bolt.Cogs.Accept do
   alias Bolt.Repo
   alias Bolt.Schema.AcceptAction
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Guild
+  alias Nostrum.Api.Message
   import Ecto.Query, only: [from: 2]
 
   @impl true
@@ -37,7 +38,7 @@ defmodule Bolt.Cogs.Accept do
          %AcceptAction{action: "add_role", data: %{"role_id" => role_id}},
          msg
        ) do
-    case Api.add_guild_member_role(msg.guild_id, msg.author.id, role_id) do
+    case Guild.add_member_role(msg.guild_id, msg.author.id, role_id) do
       {:ok} ->
         :ok
 
@@ -56,7 +57,7 @@ defmodule Bolt.Cogs.Accept do
          %AcceptAction{action: "remove_role", data: %{"role_id" => role_id}},
          msg
        ) do
-    case Api.remove_guild_member_role(msg.guild_id, msg.author.id, role_id) do
+    case Guild.remove_member_role(msg.guild_id, msg.author.id, role_id) do
       {:ok} ->
         :ok
 
@@ -72,7 +73,7 @@ defmodule Bolt.Cogs.Accept do
   end
 
   defp apply_action(%AcceptAction{action: "delete_invocation"}, msg) do
-    case Api.delete_message(msg) do
+    case Message.delete(msg) do
       {:ok} ->
         :ok
 

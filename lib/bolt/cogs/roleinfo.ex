@@ -6,7 +6,7 @@ defmodule Bolt.Cogs.RoleInfo do
   alias Bolt.Helpers
   alias Nosedrum.Converters
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Snowflake
   alias Nostrum.Struct.Guild.Role
   alias Nostrum.Struct.{Embed, Guild}
@@ -30,18 +30,18 @@ defmodule Bolt.Cogs.RoleInfo do
   @impl true
   def command(msg, "") do
     response = "🚫 expected role to lookup as sole argument"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, role) do
     case Converters.to_role(role, msg.guild_id, true) do
       {:ok, matching_role} ->
         embed = format_role_info(matching_role, msg.guild_id)
-        {:ok, _msg} = Api.create_message(msg.channel_id, embed: embed)
+        {:ok, _msg} = Message.create(msg.channel_id, embed: embed)
 
       {:error, reason} ->
         response = "🚫 conversion error: #{Helpers.clean_content(reason)}"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
     end
   end
 

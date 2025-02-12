@@ -8,7 +8,8 @@ defmodule Bolt.Cogs.ForceNick do
   alias Bolt.{Helpers, ModLog, Parsers, Repo}
   alias Nosedrum.Converters
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Guild
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.User
   require Logger
 
@@ -46,7 +47,7 @@ defmodule Bolt.Cogs.ForceNick do
                user_id: member.user.id,
                active: true
              ),
-           {:ok, _member} <- Api.modify_guild_member(msg.guild_id, member.user.id, nick: nickname) do
+           {:ok, _member} <- Guild.modify_member(msg.guild_id, member.user.id, nick: nickname) do
         infraction_map = %{
           type: "forced_nick",
           guild_id: msg.guild_id,
@@ -84,11 +85,11 @@ defmodule Bolt.Cogs.ForceNick do
           ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `#{List.first(usage())}`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

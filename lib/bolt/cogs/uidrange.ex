@@ -6,7 +6,7 @@ defmodule Bolt.Cogs.UidRange do
   alias Bolt.ErrorFormatters
   alias Bolt.Paginator
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Cache.UserCache
   alias Nostrum.Struct.Embed
 
@@ -36,7 +36,7 @@ defmodule Bolt.Cogs.UidRange do
         |> display_matches(msg.channel_id)
 
       :error ->
-        Api.create_message(msg.channel_id, "🚫 invalid snowflake, sorry")
+        Message.create(msg.channel_id, "🚫 invalid snowflake, sorry")
     end
   end
 
@@ -53,13 +53,13 @@ defmodule Bolt.Cogs.UidRange do
       |> display_matches(msg.channel_id)
     else
       :error ->
-        Api.create_message(msg.channel_id, "🚫 invalid snowflakes, sorry")
+        Message.create(msg.channel_id, "🚫 invalid snowflakes, sorry")
     end
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `#{usage()}`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   defp find_matches(guild_id, from) do
@@ -72,7 +72,7 @@ defmodule Bolt.Cogs.UidRange do
 
   defp display_matches({:error, why}, where) do
     response = ErrorFormatters.fmt(nil, why)
-    {:ok, _msg} = Api.create_message(where, response)
+    {:ok, _msg} = Message.create(where, response)
   end
 
   defp display_matches(matches, where) do

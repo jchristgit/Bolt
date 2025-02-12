@@ -6,7 +6,7 @@ defmodule Bolt.Cogs.Tag.Raw do
   alias Bolt.Repo
   alias Bolt.Schema.Tag
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   import Ecto.Query, only: [from: 2]
 
   @impl true
@@ -25,7 +25,7 @@ defmodule Bolt.Cogs.Tag.Raw do
   @impl true
   def command(msg, "") do
     response = "ℹ️ usage: `tag raw <name:str...>`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, name) do
@@ -41,7 +41,7 @@ defmodule Bolt.Cogs.Tag.Raw do
     case Repo.all(query) do
       [] ->
         response = "🚫 no tag with that name found"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
 
       [tag] ->
         file_map = %{
@@ -49,7 +49,7 @@ defmodule Bolt.Cogs.Tag.Raw do
           body: tag.content
         }
 
-        {:ok, _msg} = Api.create_message(msg.channel_id, file: file_map)
+        {:ok, _msg} = Message.create(msg.channel_id, file: file_map)
     end
   end
 end

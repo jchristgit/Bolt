@@ -6,7 +6,7 @@ defmodule Bolt.Cogs.ActionGroup.Show do
   alias Bolt.Actions
   alias Bolt.Constants
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.Embed
 
   @impl true
@@ -27,20 +27,20 @@ defmodule Bolt.Cogs.ActionGroup.Show do
   def command(msg, [name]) do
     case Actions.get_guild_group(msg.guild_id, name) do
       nil ->
-        {:ok, _msg} = Api.Message.create(msg.channel_id,
+        {:ok, _msg} = Message.create(msg.channel_id,
           content: "🚫 no action group named `#{name}` found",
           allowed_mentions: :none
         )
 
       group ->
         embed = build_action_group_embed(group)
-        Api.create_message!(msg.channel_id, embed: embed)
+        {:ok, _msg} = Message.create(msg.channel_id, embed: embed)
     end
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `#{hd(usage())}`"
-    {:ok, _msg} = Api.Message.create(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   defp build_action_group_embed(group) do

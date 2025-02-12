@@ -9,7 +9,7 @@ defmodule Bolt.Cogs.USW.Unset do
   alias Bolt.Repo
   alias Bolt.Schema.USWRuleConfig
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   import Ecto.Query, only: [from: 2]
 
   @impl true
@@ -39,7 +39,7 @@ defmodule Bolt.Cogs.USW.Unset do
 
     case Repo.delete_all(query) do
       {0, _deleted} ->
-        Api.create_message!(msg.channel_id, "🚫 no rules to delete")
+        {:ok, _msg} = Message.create(msg.channel_id, "🚫 no rules to delete")
 
       {count, deleted} ->
         postmortem =
@@ -54,7 +54,7 @@ defmodule Bolt.Cogs.USW.Unset do
         )
 
         response = "👌 deleted the following #{count} rule(s):\n#{postmortem}"
-        Api.create_message!(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
     end
   end
 
@@ -83,6 +83,6 @@ defmodule Bolt.Cogs.USW.Unset do
         "🚫 unknown rule: `#{Helpers.clean_content(rule)}`"
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

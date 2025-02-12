@@ -5,10 +5,10 @@ defmodule Bolt.Paginator do
   """
 
   use GenServer
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.Embed
   alias Nostrum.Struct.Embed.Footer
-  alias Nostrum.Struct.Message
+  alias Nostrum.Struct
 
   ## Client API
 
@@ -17,15 +17,15 @@ defmodule Bolt.Paginator do
     GenServer.start_link(__MODULE__, :ok, options)
   end
 
-  @spec paginate_over(Message.t(), Embed.t(), [Embed.t()]) :: no_return()
+  @spec paginate_over(Struct.Message.t(), Embed.t(), [Embed.t()]) :: no_return()
   def paginate_over(original_msg, base_page, []) do
     base_page = Map.put(base_page, :description, "Seems like there's nothing here yet.")
-    {:ok, _msg} = Api.create_message(original_msg.channel_id, embed: base_page)
+    {:ok, _msg} = Message.create(original_msg.channel_id, embed: base_page)
   end
 
   def paginate_over(original_msg, base_page, [page]) do
     {:ok, _msg} =
-      Api.create_message(
+      Message.create(
         original_msg.channel_id,
         embed:
           Map.merge(
@@ -48,16 +48,16 @@ defmodule Bolt.Paginator do
       )
 
     {:ok, msg} =
-      Api.create_message(
+      Message.create(
         original_msg.channel_id,
         embed: initial_embed
       )
 
     # Add the navigator reactions to the embed.
     # Sleep shortly in between to respect ratelimits.
-    {:ok} = Api.create_reaction(original_msg.channel_id, msg.id, "⬅")
-    {:ok} = Api.create_reaction(original_msg.channel_id, msg.id, "➡")
-    {:ok} = Api.create_reaction(original_msg.channel_id, msg.id, "❌")
+    {:ok} = Message.react(original_msg.channel_id, msg.id, "⬅")
+    {:ok} = Message.react(original_msg.channel_id, msg.id, "➡")
+    {:ok} = Message.react(original_msg.channel_id, msg.id, "❌")
 
     paginator_map = %{
       message: msg,
@@ -91,7 +91,7 @@ defmodule Bolt.Paginator do
   def handle_cast({:MESSAGE_REACTION_ADD, reaction}, paginators) do
     with {:ok, paginator} <- Map.fetch(paginators, reaction.message_id),
          false <- paginator.message.author.id == reaction.user_id do
-      Api.delete_user_reaction(
+      Message.delete_user_reaction(
         paginator.message.channel_id,
         paginator.message.id,
         reaction.emoji.name,
@@ -109,7 +109,7 @@ defmodule Bolt.Paginator do
 
           new_page = build_current_page(paginator)
 
-          {:ok, _msg} = Api.edit_message(paginator.message, embed: new_page)
+          {:ok, _msg} = Message.edit(paginator.message, embed: new_page)
           {:noreply, %{paginators | reaction.message_id => paginator}}
 
         reaction.emoji.name == "⬅" ->
@@ -125,14 +125,14 @@ defmodule Bolt.Paginator do
 
           new_page = build_current_page(paginator)
 
-          {:ok, _msg} = Api.edit_message(paginator.message, embed: new_page)
+          {:ok, _msg} = Message.edit(paginator.message, embed: new_page)
           {:noreply, %{paginators | reaction.message_id => paginator}}
 
         reaction.emoji.name == "➡" ->
           {:noreply, paginators}
 
         reaction.emoji.name == "❌" ->
-          Api.delete_message(paginator.message)
+          Message.delete(paginator.message)
           {:noreply, Map.delete(paginators, paginator.message.id)}
 
         true ->

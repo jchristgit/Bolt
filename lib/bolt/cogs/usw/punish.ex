@@ -7,7 +7,7 @@ defmodule Bolt.Cogs.USW.Punish do
   alias Nosedrum.TextCommand.Predicates
   alias Bolt.{Helpers, Parsers, Repo}
   alias Bolt.Schema.USWPunishmentConfig
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
 
   @impl true
   def usage, do: ["usw punish <punishment...>"]
@@ -55,7 +55,7 @@ defmodule Bolt.Cogs.USW.Punish do
           "🚫 error: #{Helpers.clean_content(reason)}"
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, ["timeout", duration]) do
@@ -81,11 +81,11 @@ defmodule Bolt.Cogs.USW.Punish do
           "🚫 error: #{Helpers.clean_content(reason)}"
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, [_unknown_type | _args]) do
     response = "🚫 unknown punishment type"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

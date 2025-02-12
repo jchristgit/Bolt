@@ -11,7 +11,7 @@ defmodule Bolt.Cogs.ModLog.Set do
   alias Bolt.Schema.ModLogConfig
   alias Nosedrum.Converters
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   import Ecto.Query, only: [from: 2]
 
   @impl true
@@ -63,7 +63,7 @@ defmodule Bolt.Cogs.ModLog.Set do
           "🚫 invalid channel: #{Helpers.clean_content(reason)}"
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, [event, channel]) do
@@ -95,11 +95,11 @@ defmodule Bolt.Cogs.ModLog.Set do
           ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `modlog set <event:str> <channel:textchannel>`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

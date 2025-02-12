@@ -7,7 +7,8 @@ defmodule Bolt.Cogs.Assign do
   alias Bolt.{ErrorFormatters, Helpers, Humanizer, ModLog, Repo}
   alias Nosedrum.Converters
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Guild
+  alias Nostrum.Api.Message
   alias Nostrum.Cache.MemberCache
   require Logger
 
@@ -37,7 +38,7 @@ defmodule Bolt.Cogs.Assign do
       with roles_row when roles_row != nil <- Repo.get(SelfAssignableRoles, msg.guild_id),
            {:ok, role} <- Converters.to_role(role_name, msg.guild_id, true),
            true <- role.id in roles_row.roles,
-           {:ok} <- Api.add_guild_member_role(msg.guild_id, msg.author.id, role.id) do
+           {:ok} <- Guild.add_member_role(msg.guild_id, msg.author.id, role.id) do
         ModLog.emit(
           msg.guild_id,
           "SELF_ASSIGNABLE_ROLES",
@@ -57,14 +58,14 @@ defmodule Bolt.Cogs.Assign do
           ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, args) when length(args) >= 2 do
     case Repo.get(SelfAssignableRoles, msg.guild_id) do
       nil ->
         response = "🚫 this guild has no self-assignable roles configured"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
 
       roles_row ->
         # Let's check if there's a multi-word role matching the arguments...
@@ -80,14 +81,14 @@ defmodule Bolt.Cogs.Assign do
           # Otherwise, assume we got a list of roles to assign.
           converted_roles = Enum.map(args, &Converters.to_role(&1, msg.guild_id, true))
           response = assign_converted(msg, converted_roles, roles_row.roles)
-          {:ok, _msg} = Api.create_message(msg.channel_id, response)
+          {:ok, _msg} = Message.create(msg.channel_id, response)
         end
     end
   end
 
   def command(msg, []) do
     response = "🚫 expected a single or multiple role name(s) to assign, got nothing"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   @spec assign_converted(Message.t(), [Role.t()], [Role.id()]) :: String.t()
@@ -120,7 +121,7 @@ defmodule Bolt.Cogs.Assign do
     else
       with {:ok, member} <- MemberCache.get(msg.guild_id, msg.author.id),
            {:ok, _member} <-
-             Api.Guild.modify_member(msg.guild_id, msg.author.id,
+             Guild.modify_member(msg.guild_id, msg.author.id,
                roles: Enum.uniq(member.roles ++ Enum.map(selected_self_assignable_roles, & &1.id))
              ) do
         added_role_list =

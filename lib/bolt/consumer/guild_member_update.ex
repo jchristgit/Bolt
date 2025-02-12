@@ -7,12 +7,12 @@ defmodule Bolt.Consumer.GuildMemberUpdate do
   alias Bolt.ModLog
   alias Bolt.Repo
   alias Bolt.Schema.Infraction
-  alias Nostrum.Api
-  alias Nostrum.Struct.Guild
+  alias Nostrum.Api.Guild
+  alias Nostrum.Struct
   alias Nostrum.Struct.Guild.Member
   import Ecto.Query, only: [from: 2]
 
-  @spec handle(guild_id :: Guild.id(), old_member :: Member.t() | nil, new_member :: Member.t()) ::
+  @spec handle(guild_id :: Struct.Guild.id(), old_member :: Member.t() | nil, new_member :: Member.t()) ::
           ModLog.on_emit()
   def handle(guild_id, nil, new_member) do
     # If the original member state could not be fetched from
@@ -26,7 +26,7 @@ defmodule Bolt.Consumer.GuildMemberUpdate do
     check_forcenick_violation(guild_id, old_member, new_member)
   end
 
-  @spec perform_regular_modlog(Guild.id(), Member.t(), Member.t()) :: ModLog.on_emit()
+  @spec perform_regular_modlog(Struct.Guild.id(), Member.t(), Member.t()) :: ModLog.on_emit()
   def perform_regular_modlog(guild_id, old_member, new_member) do
     diff_string =
       []
@@ -43,7 +43,7 @@ defmodule Bolt.Consumer.GuildMemberUpdate do
     end
   end
 
-  @spec describe_if_changed([String.t()], Guild.id(), Member.t(), Member.t(), atom) :: [
+  @spec describe_if_changed([String.t()], Struct.Guild.id(), Member.t(), Member.t(), atom) :: [
           String.t()
         ]
   def describe_if_changed(diff_list, guild_id, old_member, new_member, :roles) do
@@ -97,7 +97,7 @@ defmodule Bolt.Consumer.GuildMemberUpdate do
     end
   end
 
-  @spec check_manual_temprole_removal(Guild.id(), Member.t(), Member.t()) ::
+  @spec check_manual_temprole_removal(Struct.Guild.id(), Member.t(), Member.t()) ::
           ModLog.on_emit() | :ignored
   defp check_manual_temprole_removal(guild_id, old_member, new_member) do
     with role_diff <- List.myers_difference(old_member.roles, new_member.roles),
@@ -128,7 +128,7 @@ defmodule Bolt.Consumer.GuildMemberUpdate do
     end
   end
 
-  @spec check_forcenick_violation(Guild.id(), Member.t() | nil, Member.t()) ::
+  @spec check_forcenick_violation(Struct.Guild.id(), Member.t() | nil, Member.t()) ::
           ModLog.on_emit() | :ignored
   defp check_forcenick_violation(guild_id, old_member, new_member)
 
@@ -155,7 +155,7 @@ defmodule Bolt.Consumer.GuildMemberUpdate do
     with %Infraction{data: %{"nick" => forced_nick}} <- active_forcenick,
          false <- forced_nick == new_member.nick,
          {:ok, _member} <-
-           Api.modify_guild_member(guild_id, new_member.user_id, nick: forced_nick) do
+           Guild.modify_member(guild_id, new_member.user_id, nick: forced_nick) do
       ModLog.emit(
         guild_id,
         "INFRACTION_EVENTS",

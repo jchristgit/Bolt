@@ -12,7 +12,8 @@ defmodule Bolt.Cogs.Infraction.Expiry do
   alias Bolt.Repo
   alias Bolt.Schema.Infraction
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
+  alias Nostrum.Api.Guild
   require Logger
 
   @impl true
@@ -58,12 +59,12 @@ defmodule Bolt.Cogs.Infraction.Expiry do
           ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `infraction expiry <id:int> <expiry:duration>`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   @spec emit_log(Message.t(), Infraction, Infraction, non_neg_integer()) :: ModLog.on_emit()
@@ -101,7 +102,7 @@ defmodule Bolt.Cogs.Infraction.Expiry do
          {:expired?, false} <- {:expired?, DateTime.compare(old_expiry, now) == :lt},
          {:api, {:ok, _member}} <-
            {:api,
-            Api.modify_guild_member(guild_id, user_id, communication_disabled_until: new_expiry)} do
+            Guild.modify_member(guild_id, user_id, communication_disabled_until: new_expiry)} do
       changeset = Infraction.changeset(infraction, %{expires_at: new_expiry})
       Repo.update(changeset)
     else

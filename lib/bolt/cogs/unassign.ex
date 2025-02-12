@@ -7,7 +7,8 @@ defmodule Bolt.Cogs.Unassign do
   alias Nosedrum.TextCommand.Predicates
   alias Bolt.{ErrorFormatters, Helpers, ModLog, Repo}
   alias Bolt.Schema.SelfAssignableRoles
-  alias Nostrum.Api
+  alias Nostrum.Api.Guild
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.User
 
   @impl true
@@ -36,7 +37,7 @@ defmodule Bolt.Cogs.Unassign do
   @impl true
   def command(msg, "") do
     response = "🚫 expected the role name to unassign, got nothing"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, role_name) do
@@ -44,7 +45,7 @@ defmodule Bolt.Cogs.Unassign do
       with roles_row when roles_row != nil <- Repo.get(SelfAssignableRoles, msg.guild_id),
            {:ok, role} <- Converters.to_role(role_name, msg.guild_id, true),
            true <- role.id in roles_row.roles,
-           {:ok} <- Api.remove_guild_member_role(msg.guild_id, msg.author.id, role.id) do
+           {:ok} <- Guild.remove_member_role(msg.guild_id, msg.author.id, role.id) do
         ModLog.emit(
           msg.guild_id,
           "SELF_ASSIGNABLE_ROLES",
@@ -64,6 +65,6 @@ defmodule Bolt.Cogs.Unassign do
           ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

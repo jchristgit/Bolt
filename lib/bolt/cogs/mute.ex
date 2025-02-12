@@ -4,7 +4,7 @@ defmodule Bolt.Cogs.Mute do
 
   alias Bolt.Cogs.Tempmute
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
 
   @impl true
   def usage, do: ["mute <user:member> [reason:str...]"]
@@ -36,6 +36,6 @@ defmodule Bolt.Cogs.Mute do
 
   def command(msg, _args) do
     response = "ℹ️ usage: `#{List.first(usage())}`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

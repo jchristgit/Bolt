@@ -16,7 +16,8 @@ defmodule Bolt.Cogs.Tempban do
     Schema.Infraction
   }
 
-  alias Nostrum.Api
+  alias Nostrum.Api.Guild
+  alias Nostrum.Api.Message
   import Ecto.Query, only: [from: 2]
   require Logger
 
@@ -61,7 +62,7 @@ defmodule Bolt.Cogs.Tempban do
                select: {infr.id, infr.expires_at}
              ),
            [] <- Repo.all(query),
-           {:ok} <- Api.create_guild_ban(msg.guild_id, user_id, 7),
+           {:ok} <- Guild.ban_member(msg.guild_id, user_id, 7),
            infraction_map <- %{
              type: "tempban",
              guild_id: msg.guild_id,
@@ -101,11 +102,11 @@ defmodule Bolt.Cogs.Tempban do
           ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `tempban <user:snowflake|member> <duration:duration> [reason:str...]`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

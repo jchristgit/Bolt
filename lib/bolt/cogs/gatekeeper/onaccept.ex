@@ -8,7 +8,7 @@ defmodule Bolt.Cogs.GateKeeper.OnAccept do
   alias Bolt.{ErrorFormatters, ModLog, Repo}
   alias Nosedrum.Converters
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.User
 
   @impl true
@@ -50,7 +50,7 @@ defmodule Bolt.Cogs.GateKeeper.OnAccept do
         "👌 deleted **#{total_deleted}** accept action(s)"
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, ["add", "role" | role_str]) do
@@ -74,7 +74,7 @@ defmodule Bolt.Cogs.GateKeeper.OnAccept do
         error -> ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, ["remove", "role" | role_str]) do
@@ -98,7 +98,7 @@ defmodule Bolt.Cogs.GateKeeper.OnAccept do
         error -> ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, ["delete", "invocation"]) do
@@ -125,11 +125,11 @@ defmodule Bolt.Cogs.GateKeeper.OnAccept do
           ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _) do
     response = "ℹ️ usage: `#{usage()}`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

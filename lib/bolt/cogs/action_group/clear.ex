@@ -7,7 +7,7 @@ defmodule Bolt.Cogs.ActionGroup.Clear do
   alias Bolt.ErrorFormatters
   alias Bolt.ModLog
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   import Bolt.Humanizer, only: [human_user: 1]
 
   @impl true
@@ -41,11 +41,11 @@ defmodule Bolt.Cogs.ActionGroup.Clear do
           ErrorFormatters.fmt(msg, error)
       end
 
-    Api.create_message!(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `#{hd(usage())}`"
-    Api.create_message!(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

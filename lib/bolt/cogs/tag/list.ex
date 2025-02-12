@@ -6,7 +6,7 @@ defmodule Bolt.Cogs.Tag.List do
   alias Nosedrum.TextCommand.Predicates
   alias Bolt.{Constants, Paginator, Repo}
   alias Bolt.Schema.Tag
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.Embed
   import Ecto.Query, only: [from: 2]
 
@@ -47,6 +47,6 @@ defmodule Bolt.Cogs.Tag.List do
 
   def command(msg, _args) do
     response = "ℹ️ usage: `tag list`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

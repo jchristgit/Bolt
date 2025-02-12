@@ -9,7 +9,7 @@ defmodule Bolt.Cogs.ModLog.Unset do
   alias Bolt.Repo
   alias Bolt.Schema.ModLogConfig
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
 
   @impl true
   def usage, do: ["modlog unset <event:str>"]
@@ -42,7 +42,7 @@ defmodule Bolt.Cogs.ModLog.Unset do
     {deleted, nil} = Repo.delete_all(query)
 
     response = "👌 deleted #{deleted} existing mod log configuration(s)"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, [event]) do
@@ -70,11 +70,11 @@ defmodule Bolt.Cogs.ModLog.Unset do
         "🚫 `#{Helpers.clean_content(event)}` is not a known event"
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `modlog unset <event:str>`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

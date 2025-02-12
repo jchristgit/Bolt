@@ -6,7 +6,7 @@ defmodule Bolt.Cogs.USW.Escalate do
   alias Bolt.Repo
   alias Bolt.Schema.USWPunishmentConfig
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
 
   @impl true
   def usage, do: ["usw escalate [on|off]"]
@@ -36,7 +36,7 @@ defmodule Bolt.Cogs.USW.Escalate do
           "ℹ automatic punishment escalation is " <> if escalate, do: "enabled", else: "disabled"
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, ["on"]) do
@@ -51,7 +51,7 @@ defmodule Bolt.Cogs.USW.Escalate do
           "👌 automatic punishment escalation is now enabled"
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, ["off"]) do
@@ -66,11 +66,11 @@ defmodule Bolt.Cogs.USW.Escalate do
           "👌 automatic punishment escalation is now disabled"
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `usw escalate [on|off]`"
-    {:ok, _msg} = Api.create_message(msg.channeL_id, response)
+    {:ok, _msg} = Message.create(msg.channeL_id, response)
   end
 end

@@ -5,7 +5,7 @@ defmodule Bolt.MixProject do
     [
       app: :bolt,
       version: "0.14.0-alpha.1+#{git_version()}",
-      elixir: "~> 1.14",
+      elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       preferred_cli_env: [coveralls: :test],
@@ -27,7 +27,7 @@ defmodule Bolt.MixProject do
   defp deps do
     [
       # Discord interfacing
-      {:nostrum, path: "../nostrum", override: true},
+      {:nostrum, github: "Kraigie/nostrum", override: true},
       {:nosedrum, github: "jchristgit/nosedrum", override: true},
 
       # PostgreSQL interfacing

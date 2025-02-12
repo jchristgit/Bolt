@@ -6,7 +6,7 @@ defmodule Bolt.Cogs.ModLog.Status do
   alias Nosedrum.TextCommand.Predicates
   alias Bolt.{Constants, Paginator, Repo}
   alias Bolt.Schema.ModLogConfig
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.Embed
   import Ecto.Query, only: [from: 2]
 
@@ -33,7 +33,7 @@ defmodule Bolt.Cogs.ModLog.Status do
     case Repo.all(query) do
       [] ->
         response = "❌ modlog is not configured"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
 
       config_rows ->
         pages =
@@ -84,11 +84,11 @@ defmodule Bolt.Cogs.ModLog.Status do
         "ℹ️  unlogged events: #{Enum.join(unlogged_events, ", ")}"
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `modlog status`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

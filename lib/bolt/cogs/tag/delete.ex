@@ -6,8 +6,8 @@ defmodule Bolt.Cogs.Tag.Delete do
   alias Bolt.{Helpers, Repo}
   alias Bolt.Schema.Tag
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
-  alias Nostrum.Struct.Message
+  alias Nostrum.Api.Message
+  alias Nostrum.Struct
   alias Nostrum.Struct.User
 
   @impl true
@@ -27,11 +27,11 @@ defmodule Bolt.Cogs.Tag.Delete do
   def predicates, do: [&Predicates.guild_only/1]
 
   @impl true
-  def command(%Message{author: %User{id: author_id}} = msg, tag_name) do
+  def command(%Struct.Message{author: %User{id: author_id}} = msg, tag_name) do
     case Repo.get_by(Tag, name: tag_name, guild_id: msg.guild_id) do
       nil ->
         response = "🚫 no tag named `#{Helpers.clean_content(tag_name)}` found on this guild"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
 
       %Tag{author_id: creator_id} = tag when creator_id == author_id ->
         response =
@@ -40,13 +40,13 @@ defmodule Bolt.Cogs.Tag.Delete do
             {:error, _reason} -> "❌ couldn't delete the tag because of some weird error"
           end
 
-        Api.create_message!(msg.channel_id, response)
+        {:ok, _} = Message.create(msg.channel_id, response)
 
       tag ->
         response = "🚫 only the tag author, <@#{tag.author_id}>, can delete the tag"
 
         {:ok, _msg} =
-          Api.create_message(msg.channel_id, content: response, allowed_mentions: :none)
+          Message.create(msg.channel_id, content: response, allowed_mentions: :none)
     end
   end
 end

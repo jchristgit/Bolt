@@ -7,7 +7,7 @@ defmodule Bolt.Cogs.Autoredact do
   alias Bolt.Parsers
   alias Bolt.Predicates
   alias Bolt.Redact
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Cache.GuildCache
   alias Nostrum.Snowflake
   import Bolt.Helpers, only: [clean_content: 1]
@@ -61,7 +61,7 @@ defmodule Bolt.Cogs.Autoredact do
           "🚫 bad guild ID"
       end
 
-    Api.create_message!(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, [raw_guild, "status"]) do
@@ -88,7 +88,7 @@ defmodule Bolt.Cogs.Autoredact do
           "🚫 bad guild ID"
       end
 
-    Api.create_message!(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, [raw_guild, raw_age | raw_excluded_channels]) do
@@ -109,12 +109,12 @@ defmodule Bolt.Cogs.Autoredact do
           ErrorFormatters.fmt(msg, error)
       end
 
-    Api.create_message!(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage:\n```rs\n#{Enum.join(usage(), "\n")}\n```"
-    Api.create_message!(msg, response)
+    {:ok, _msg} = Message.create(msg, response)
   end
 
   defp parse_excluded_channels(channels) do

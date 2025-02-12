@@ -7,7 +7,7 @@ defmodule Bolt.Cogs.Infraction.User do
   alias Nosedrum.TextCommand.Predicates
   alias Bolt.{Constants, Helpers, Humanizer, Paginator, Repo}
   alias Bolt.Schema.Infraction
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.Embed
   import Ecto.Query, only: [from: 2]
 
@@ -62,13 +62,13 @@ defmodule Bolt.Cogs.Infraction.User do
 
       {:error, reason} ->
         response = "🚫 #{Helpers.clean_content(reason)}"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
     end
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `infraction user <user:snowflake|member...>`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   @spec format_relative_datetime(DateTime.t()) :: String.t()

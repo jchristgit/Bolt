@@ -10,7 +10,7 @@ defmodule Bolt.Cogs.USW.Set do
   alias Bolt.Repo
   alias Bolt.Schema.USWRuleConfig
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
 
   @impl true
   def usage, do: ["usw set <rule:str> <count:int> [per] <interval:int>"]
@@ -79,7 +79,7 @@ defmodule Bolt.Cogs.USW.Set do
           ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, [filter, count_str, "per", interval_str]) do
@@ -88,6 +88,6 @@ defmodule Bolt.Cogs.USW.Set do
 
   def command(msg, _args) do
     response = "🚫 expected 3 arguments (rule, count, interval), got something else"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

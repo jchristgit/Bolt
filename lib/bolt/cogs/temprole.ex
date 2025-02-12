@@ -13,7 +13,8 @@ defmodule Bolt.Cogs.Temprole do
   alias Bolt.Schema.Infraction
   alias Nosedrum.Converters
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Guild
+  alias Nostrum.Api.Message
   import Ecto.Query, only: [from: 2]
 
   @impl true
@@ -59,7 +60,7 @@ defmodule Bolt.Cogs.Temprole do
            [] <- Repo.all(query),
            {:ok, expiry} <- Parsers.human_future_date(duration),
            {:ok} <-
-             Api.add_guild_member_role(
+             Guild.add_member_role(
                msg.guild_id,
                member.user.id,
                role.id
@@ -106,11 +107,11 @@ defmodule Bolt.Cogs.Temprole do
           ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _incorrect_args) do
     response = "ℹ️ usage: `temprole <user:member> <role:role> <duration:duration> [reason:str...]`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

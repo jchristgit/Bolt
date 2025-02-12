@@ -7,24 +7,24 @@ defmodule Bolt.Consumer.MessageCreate do
   alias Bolt.USW
   alias Nosedrum.MessageCache.Agent, as: MessageCache
   alias Nosedrum.TextCommand.Invoker.Split, as: CommandInvoker
-  alias Nostrum.Api
-  alias Nostrum.Struct.Message
+  alias Nostrum.Api.Message
+  alias Nostrum.Struct
 
   @spec handle(Message.t()) :: :ok | nil
   def handle(msg) do
     unless msg.author.bot do
       case CommandInvoker.handle_message(msg, @nosedrum_storage_implementation) do
         {:error, {:unknown_subcommand, _name, :known, known}} ->
-          Api.create_message(
+          Message.create(
             msg.channel_id,
             "🚫 unknown subcommand, known subcommands: `#{Enum.join(known, "`, `")}`"
           )
 
         {:error, :predicate, {:error, reason}} ->
-          Api.create_message(msg.channel_id, "❌ cannot evaluate permissions: #{reason}")
+          Message.create(msg.channel_id, "❌ cannot evaluate permissions: #{reason}")
 
         {:error, :predicate, {:noperm, reason}} ->
-          Api.create_message(msg.channel_id, reason)
+          Message.create(msg.channel_id, reason)
 
         _ ->
           :ok
@@ -34,7 +34,7 @@ defmodule Bolt.Consumer.MessageCreate do
     end
   end
 
-  defp postprocess(%Message{guild_id: nil}), do: :ok
+  defp postprocess(%Struct.Message{guild_id: nil}), do: :ok
 
   defp postprocess(msg) do
     MessageCache.consume(msg, Bolt.MessageCache)

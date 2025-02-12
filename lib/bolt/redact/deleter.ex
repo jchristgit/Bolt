@@ -6,7 +6,7 @@ defmodule Bolt.Redact.Deleter do
   alias Bolt.Repo
   alias Bolt.Schema.RedactConfig
   alias Bolt.Schema.RedactPendingMessage, as: PendingMessage
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   import Ecto.Query, only: [from: 2]
   import Nostrum.Constants, only: [discord_epoch: 0]
   require Logger
@@ -84,7 +84,7 @@ defmodule Bolt.Redact.Deleter do
   end
 
   defp delete_message(channel_id, message_id) do
-    case Api.delete_message(channel_id, message_id) do
+    case Message.delete(channel_id, message_id) do
       {:ok} ->
         :gone
 

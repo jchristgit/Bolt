@@ -9,7 +9,7 @@ defmodule Bolt.Cogs.Infraction.Reason do
   alias Bolt.Repo
   alias Bolt.Schema.Infraction
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
 
   @impl true
   def usage, do: ["infraction reason <id:int> <new_reason:str...>"]
@@ -65,11 +65,11 @@ defmodule Bolt.Cogs.Infraction.Reason do
           "🚫 expected an integer (infraction ID to edit), but that is not a valid integer"
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `infraction reason <id:int> <new_reason:str...>`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

@@ -8,7 +8,7 @@ defmodule Bolt.Redact.Ingestor do
   alias Bolt.Schema.RedactConfig
   alias Bolt.Schema.RedactPendingMessage, as: PendingMessage
   alias Ecto.Changeset
-  alias Nostrum.Api
+  alias Nostrum.Api.Channel
   alias Nostrum.Snowflake
   alias Nostrum.Struct.Message
   require Logger
@@ -95,7 +95,7 @@ defmodule Bolt.Redact.Ingestor do
           ingestion: ingestion
         } = data
       ) do
-    case Api.get_channel_messages(channel, 100, {:after, after_id}) do
+    case Channel.messages(channel, 100, {:after, after_id}) do
       {:ok, descending_messages} ->
         case descending_messages do
           [] ->

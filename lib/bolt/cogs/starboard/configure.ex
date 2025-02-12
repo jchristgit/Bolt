@@ -8,7 +8,7 @@ defmodule Bolt.Cogs.Starboard.Configure do
   alias Bolt.Starboard
   alias Nosedrum.Converters
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   import Bolt.Humanizer, only: [human_user: 1]
 
   @impl true
@@ -46,16 +46,16 @@ defmodule Bolt.Cogs.Starboard.Configure do
         "#{human_user(msg.author)} configured the starboard in <##{channel.id}> for a minimum of #{min_stars} star(s)"
       )
 
-      Api.create_message!(msg.channel_id, "👌 enabled the starboard in <##{channel.id}>")
+      {:ok, _msg} = Message.create(msg.channel_id, "👌 enabled the starboard in <##{channel.id}>")
     else
       error ->
         response = ErrorFormatters.fmt(msg, error)
-        Api.create_message!(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
     end
   end
 
   def command(msg, _anything) do
     response = "ℹ️ usage: `#{hd(usage())}`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

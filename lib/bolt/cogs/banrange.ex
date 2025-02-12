@@ -6,10 +6,10 @@ defmodule Bolt.Cogs.BanRange do
   alias Bolt.Moderation
   alias Bolt.Paginator
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
+  alias Nostrum.Struct
   alias Nostrum.Struct.Embed
   alias Nostrum.Struct.Guild
-  alias Nostrum.Struct.Message
   alias Nostrum.Struct.User
 
   @impl true
@@ -57,7 +57,7 @@ defmodule Bolt.Cogs.BanRange do
         |> display(msg)
 
       :error ->
-        Api.create_message!(msg.channel_id, "🚫 invalid snowflake, sorry")
+        {:ok, _msg} = Message.create(msg.channel_id, "🚫 invalid snowflake, sorry")
     end
   end
 
@@ -78,16 +78,16 @@ defmodule Bolt.Cogs.BanRange do
       |> display(msg)
     else
       :error ->
-        Api.create_message!(msg.channel_id, "🚫 invalid snowflakes, sorry")
+        {:ok, _msg} = Message.create(msg.channel_id, "🚫 invalid snowflakes, sorry")
     end
   end
 
   def command(msg, _args) do
     response = "ℹ️  usage:\n```\n#{Enum.join(usage(), "\n")}\n```"
-    Api.create_message!(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
-  @spec execute([User.id()], Guild.id(), User.t(), String.t()) :: {:ok, Message.t()}
+  @spec execute([User.id()], Guild.id(), User.t(), String.t()) :: {:ok, Struct.Message.t()}
   defp execute(targets, guild_id, actor, reason) do
     targets
     |> Stream.map(fn {snowflake, _member} -> snowflake end)

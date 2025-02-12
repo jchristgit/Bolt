@@ -1,12 +1,12 @@
 defmodule Bolt.Cogs.LastJoins do
   @moduledoc false
 
-  @behaviour Nosedrum.Command
+  @behaviour Nosedrum.TextCommand
 
   alias Bolt.{Constants, Helpers, Paginator, Parsers}
   alias Nosedrum.MessageCache.Agent, as: MessageCache
-  alias Nosedrum.Predicates
-  alias Nostrum.Api
+  alias Nosedrum.TextCommand.Predicates
+  alias Nostrum.Api.Message
   alias Nostrum.Cache.MemberCache
   alias Nostrum.Cache.UserCache
   alias Nostrum.Struct.Embed
@@ -72,13 +72,13 @@ defmodule Bolt.Cogs.LastJoins do
 
     most_recent_members =
       msg.guild_id
-      |> MemberCache.get()
+      |> MemberCache.by_guild()
       |> filter_by_options(msg.guild_id, options)
       |> sort_by_limit(& &1.joined_at, sanitize_limit(limit))
 
     case most_recent_members do
       [] ->
-        {:ok, _msg} = Api.create_message(msg.channel_id, "guild uncached, sorry")
+        {:ok, _msg} = Message.create(msg.channel_id, "guild uncached, sorry")
 
       members ->
         pages =
@@ -100,7 +100,7 @@ defmodule Bolt.Cogs.LastJoins do
     invalid_args = Parsers.describe_invalid_args(invalid)
 
     {:ok, _msg} =
-      Api.create_message(
+      Message.create(
         msg.channel_id,
         "🚫 unrecognized argument(s) or invalid value: #{invalid_args}"
       )

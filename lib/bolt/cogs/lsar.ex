@@ -43,7 +43,7 @@ defmodule Bolt.Cogs.Lsar do
     case Repo.get(SelfAssignableRoles, msg.guild_id) do
       nil ->
         response = "🚫 this guild has not configured any self-assignable roles"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Api.Message.create(msg.channel_id, response)
 
       role_row ->
         pages = format_roles(msg, role_row.roles)
@@ -62,6 +62,6 @@ defmodule Bolt.Cogs.Lsar do
 
   def command(msg, _args) do
     response = "ℹ️ usage: `lsar`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Api.Message.create(msg.channel_id, response)
   end
 end

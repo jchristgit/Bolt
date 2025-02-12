@@ -5,7 +5,7 @@ defmodule Bolt.Cogs.Ban do
 
   alias Bolt.Moderation
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
 
   @impl true
   def usage, do: ["ban <user:snowflake|member> [reason:str]"]
@@ -38,15 +38,15 @@ defmodule Bolt.Cogs.Ban do
     case Moderation.ban(target, msg.guild_id, msg.author, reason) do
       {:ok, infraction, user_string} ->
         response = "👌 permanently banned #{user_string} (##{infraction.id})"
-        Api.create_message!(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
 
       {:error, response, _user} ->
-        Api.create_message!(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
     end
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `ban <user:snowflake|member> [reason:str...]`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

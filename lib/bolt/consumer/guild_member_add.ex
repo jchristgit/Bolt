@@ -3,13 +3,15 @@ defmodule Bolt.Consumer.GuildMemberAdd do
 
   alias Bolt.{Helpers, Humanizer, ModLog, Repo}
   alias Bolt.Schema.{Infraction, JoinAction}
-  alias Nostrum.Api
+  alias Nostrum.Api.Guild
+  alias Nostrum.Api.Message
+  alias Nostrum.Api.User
   alias Nostrum.Snowflake
-  alias Nostrum.Struct.{Guild, Message}
+  alias Nostrum.Struct
   alias Nostrum.Struct.Guild.Member
   import Ecto.Query, only: [from: 2]
 
-  @spec handle(Guild.id(), Guild.Member.t()) :: {:ok, Message.t()}
+  @spec handle(Struct.Guild.id(), Struct.Guild.Member.t()) :: {:ok, Struct.Message.t()}
   def handle(guild_id, member) do
     creation_datetime = Snowflake.creation_time(member.user_id)
 
@@ -24,7 +26,7 @@ defmodule Bolt.Consumer.GuildMemberAdd do
     execute_join_actions(guild_id, member)
   end
 
-  @spec check_active_temprole(Guild.id(), Guild.Member.t()) :: :ignored | ModLog.on_emit()
+  @spec check_active_temprole(Struct.Guild.id(), Struct.Guild.Member.t()) :: :ignored | ModLog.on_emit()
   defp check_active_temprole(guild_id, member) do
     query =
       from(
@@ -42,7 +44,7 @@ defmodule Bolt.Consumer.GuildMemberAdd do
       infractions ->
         Enum.each(infractions, fn temprole_infraction ->
           # credo:disable-for-next-line Credo.Check.Refactor.Nesting
-          case Api.add_guild_member_role(
+          case Guild.add_member_role(
                  guild_id,
                  member.user.id,
                  temprole_infraction.data["role_id"]
@@ -67,7 +69,7 @@ defmodule Bolt.Consumer.GuildMemberAdd do
     end
   end
 
-  @spec execute_join_actions(Guild.id(), Guild.Member.t()) :: :ok
+  @spec execute_join_actions(Struct.Guild.id(), Struct.Guild.Member.t()) :: :ok
   defp execute_join_actions(guild_id, member) do
     query = from(action in JoinAction, where: action.guild_id == ^guild_id)
 
@@ -76,7 +78,7 @@ defmodule Bolt.Consumer.GuildMemberAdd do
     |> Enum.each(&execute_single_action(&1, guild_id, member))
   end
 
-  @spec execute_single_action(JoinAction, Guild.id(), Guild.Member.t()) ::
+  @spec execute_single_action(JoinAction, Struct.Guild.id(), Struct.Guild.Member.t()) ::
           {:ok, Message.t()} | :ignored | :ok
   defp execute_single_action(action, guild_id, member)
 
@@ -85,7 +87,7 @@ defmodule Bolt.Consumer.GuildMemberAdd do
          guild_id,
          member
        ) do
-    case Api.add_guild_member_role(guild_id, member.user.id, role_id) do
+    case Guild.add_member_role(guild_id, member.user.id, role_id) do
       {:ok} ->
         :ok
 
@@ -109,7 +111,7 @@ defmodule Bolt.Consumer.GuildMemberAdd do
        ) do
     text = String.replace(template, "{mention}", Member.mention(member))
 
-    Api.create_message(target_channel, text)
+    Message.create(target_channel, text)
   end
 
   defp execute_single_action(
@@ -119,9 +121,9 @@ defmodule Bolt.Consumer.GuildMemberAdd do
        ) do
     text = String.replace(template, "{mention}", Member.mention(member))
 
-    case Api.create_dm(member.user.id) do
+    case User.create_dm(member.user.id) do
       {:ok, dm_channel} ->
-        Api.create_message(dm_channel.id, text)
+        Message.create(dm_channel.id, text)
 
       _error ->
         :ignored

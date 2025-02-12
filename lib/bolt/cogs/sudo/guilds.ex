@@ -4,7 +4,7 @@ defmodule Bolt.Cogs.Sudo.Guilds do
   alias Bolt.Constants
   alias Bolt.Helpers
   alias Bolt.Paginator
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Cache.GuildCache
   alias Nostrum.Struct.Embed
   alias Nostrum.Struct.Embed.Field
@@ -42,6 +42,6 @@ defmodule Bolt.Cogs.Sudo.Guilds do
 
   def command(msg, _args) do
     response = "🚫 this subcommand accepts no arguments"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

@@ -6,7 +6,8 @@ defmodule Bolt.Cogs.Kick do
   alias Nosedrum.Converters
   alias Nosedrum.TextCommand.Predicates
   alias Bolt.{ErrorFormatters, Helpers, Humanizer, ModLog, Repo, Schema.Infraction}
-  alias Nostrum.Api
+  alias Nostrum.Api.Guild
+  alias Nostrum.Api.Message
   require Logger
 
   @impl true
@@ -39,7 +40,7 @@ defmodule Bolt.Cogs.Kick do
       with reason <- Enum.join(reason_list, " "),
            {:ok, member} <- Converters.to_member(user, msg.guild_id),
            {:ok, true} <- Helpers.above?(msg.guild_id, msg.author.id, member.user.id),
-           {:ok} <- Api.remove_guild_member(msg.guild_id, member.user.id),
+           {:ok} <- Guild.kick_member(msg.guild_id, member.user.id),
            infraction <- %{
              type: "kick",
              guild_id: msg.guild_id,
@@ -72,11 +73,11 @@ defmodule Bolt.Cogs.Kick do
           ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `kick <user:member> [reason:str...]`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

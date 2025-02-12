@@ -6,7 +6,7 @@ defmodule Bolt.Cogs.USW.Status do
   alias Nosedrum.TextCommand.Predicates
   alias Bolt.{Constants, Humanizer, Paginator, Repo}
   alias Bolt.Schema.{USWPunishmentConfig, USWRuleConfig}
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.Embed
   alias Nostrum.Struct.Embed.Field
   import Ecto.Query, only: [from: 2]
@@ -49,7 +49,7 @@ defmodule Bolt.Cogs.USW.Status do
     case pages do
       [] ->
         response = "🚫 no rules configured on this guild"
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
 
       _ ->
         base_embed = %Embed{
@@ -64,7 +64,7 @@ defmodule Bolt.Cogs.USW.Status do
 
   def command(msg, _args) do
     response = "ℹ️ usage: `usw status`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   # ...

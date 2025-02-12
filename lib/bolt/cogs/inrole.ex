@@ -7,7 +7,7 @@ defmodule Bolt.Cogs.InRole do
   alias Bolt.{Constants, ErrorFormatters, Paginator}
   alias Nosedrum.Converters
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.{Embed, User}
 
   @impl true
@@ -36,7 +36,7 @@ defmodule Bolt.Cogs.InRole do
   @impl true
   def command(msg, "") do
     response = "ℹ️ usage: `inrole <role:role...>`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, role_string) do
@@ -67,7 +67,7 @@ defmodule Bolt.Cogs.InRole do
 
       error ->
         response = ErrorFormatters.fmt(msg, error)
-        {:ok, _msg} = Api.create_message(msg.channel_id, response)
+        {:ok, _msg} = Message.create(msg.channel_id, response)
     end
   end
 end

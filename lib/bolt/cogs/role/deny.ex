@@ -10,7 +10,7 @@ defmodule Bolt.Cogs.Role.Deny do
   alias Bolt.Schema.SelfAssignableRoles
   alias Nosedrum.Converters
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
 
   @impl true
   def usage, do: ["role deny <role:role...>"]
@@ -39,7 +39,7 @@ defmodule Bolt.Cogs.Role.Deny do
   @impl true
   def command(msg, "") do
     response = "ℹ️ usage: `role deny <role:role...>`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, role_name) do
@@ -77,6 +77,6 @@ defmodule Bolt.Cogs.Role.Deny do
           "🚫 cannot convert `#{Helpers.clean_content(role_name)}` to `role`: #{reason}"
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

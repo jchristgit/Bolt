@@ -3,7 +3,7 @@ defmodule Bolt.Action.DeleteInvites do
   @behaviour Bolt.Action
 
   alias Bolt.ModLog
-  alias Nostrum.Api
+  alias Nostrum.Api.Invite
   import Ecto.Changeset
   use Ecto.Schema
 
@@ -16,11 +16,11 @@ defmodule Bolt.Action.DeleteInvites do
   end
 
   def run(_options, %{guild_id: guild_id}) do
-    case Api.get_guild_invites(guild_id) do
+    case Invite.guild_invites(guild_id) do
       {:ok, invites} ->
         successful_deletions =
           invites
-          |> Stream.map(&Api.delete_invite(&1.code))
+          |> Stream.map(&Invite.delete(&1.code))
           |> Enum.count(&match?({:ok, _code}, &1))
 
         ModLog.emit(

@@ -6,7 +6,7 @@ defmodule Bolt.Cogs.Tag.Create do
   alias Nosedrum.TextCommand.Predicates
   alias Bolt.{ErrorFormatters, Helpers, Repo}
   alias Bolt.Schema.Tag
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
 
   @impl true
   def usage, do: ["tag create <name:str> <content:str...>"]
@@ -31,11 +31,11 @@ defmodule Bolt.Cogs.Tag.Create do
 
   @impl true
   def command(msg, ["", _content]) do
-    {:ok, _msg} = Api.create_message(msg.channel_id, "🚫 tag name must not be empty")
+    {:ok, _msg} = Message.create(msg.channel_id, "🚫 tag name must not be empty")
   end
 
   def command(msg, [_name, ""]) do
-    {:ok, _msg} = Api.create_message(msg.channel_id, "🚫 tag content must not be empty")
+    {:ok, _msg} = Message.create(msg.channel_id, "🚫 tag content must not be empty")
   end
 
   def command(msg, [name | content]) do
@@ -57,11 +57,11 @@ defmodule Bolt.Cogs.Tag.Create do
           ErrorFormatters.fmt(msg, error)
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `tag create <name:str> <content:str...>`"
-    {:ok, _msg} = Api.create_message(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 end

@@ -4,8 +4,9 @@ defmodule Bolt.Starboard do
   alias Bolt.Repo
   alias Bolt.Schema.{StarboardConfig, StarboardMessage}
   alias Ecto.Changeset
-  alias Nostrum.Api
-  alias Nostrum.Struct.{Channel, Embed, Guild, Message, User}
+  alias Nostrum.Api.Message
+  alias Nostrum.Struct
+  alias Nostrum.Struct.{Channel, Embed, Guild, User}
   import Ecto.Query, only: [from: 2]
 
   @doc """
@@ -61,7 +62,7 @@ defmodule Bolt.Starboard do
   @doc """
   Create or update the starboard message for the given message & star count in the given starboard channel.
   """
-  @spec create_or_update_starboard_message(Channel.id(), Guild.id(), Message.t(), pos_integer()) ::
+  @spec create_or_update_starboard_message(Channel.id(), Guild.id(), Struct.Message.t(), pos_integer()) ::
           any()
   def create_or_update_starboard_message(starboard_channel_id, guild_id, message, star_count) do
     # Discord doesn't send us the guild_id in the message here, so add it ourselves.
@@ -70,11 +71,11 @@ defmodule Bolt.Starboard do
 
     case Repo.get_by(StarboardMessage, guild_id: guild_id, message_id: message.id) do
       %StarboardMessage{starboard_message_id: starboard_message_id} ->
-        Api.edit_message(starboard_channel_id, starboard_message_id, textual_content)
+        Message.edit(starboard_channel_id, starboard_message_id, textual_content)
 
       nil ->
         {:ok, created_message} =
-          Api.create_message(starboard_channel_id,
+          Message.create(starboard_channel_id,
             content: textual_content,
             embeds: [starboard_embed_for_message(message, jump_link)]
           )
@@ -104,7 +105,7 @@ defmodule Bolt.Starboard do
     |> maybe_add_image(message)
   end
 
-  defp maybe_add_image(embed, %Message{attachments: [attachment]}) do
+  defp maybe_add_image(embed, %Struct.Message{attachments: [attachment]}) do
     if String.ends_with?(attachment.filename, [".png", ".jpg", ".jpeg"]) do
       Embed.put_image(embed, attachment.url)
     else
@@ -120,11 +121,11 @@ defmodule Bolt.Starboard do
   Handle someone adding a star reaction to the given message.
   """
   @spec handle_star_reaction(Guild.id(), Channel.id(), Message.id()) ::
-          {:ok, Message.t() | :too_little_stars} | {:error, any() | :no_stars_on_refresh}
+          {:ok, Struct.Message.t() | :too_little_stars} | {:error, any() | :no_stars_on_refresh}
   def handle_star_reaction(guild_id, channel_id, message_id) do
     with %StarboardConfig{channel_id: starboard_channel_id, min_stars: min_stars} <-
            Repo.get_by(StarboardConfig, guild_id: guild_id),
-         {:ok, message} <- Api.get_channel_message(channel_id, message_id),
+         {:ok, message} <- Message.get(channel_id, message_id),
          star_reaction when star_reaction != nil <-
            Enum.find(message.reactions, &(&1.emoji.name == "⭐")),
          true <-

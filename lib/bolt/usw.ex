@@ -13,6 +13,7 @@ defmodule Bolt.USW do
   alias Bolt.USW.Deduplicator
   alias Bolt.USW.Escalator
   alias Bolt.USW.Rules
+  alias Nostrum.Api.Guild
   alias Nostrum.Api
   alias Nostrum.Cache.GuildCache
   alias Nostrum.Cache.Me
@@ -103,7 +104,7 @@ defmodule Bolt.USW do
          user_id,
          description
        ) do
-    case Api.add_guild_member_role(guild_id, user_id, role_id) do
+    case Guild.add_member_role(guild_id, user_id, role_id) do
       {:ok} ->
         escalator_level = Escalator.level_for(user_id)
         expiry_seconds = calculate_expiry(expiry_seconds, escalator_level, escalator_enabled)
@@ -167,7 +168,7 @@ defmodule Bolt.USW do
     now = DateTime.utc_now()
     timeout_until = DateTime.add(now, expiry_seconds)
 
-    case Api.modify_guild_member(guild_id, user_id, communication_disabled_until: timeout_until) do
+    case Guild.modify_member(guild_id, user_id, communication_disabled_until: timeout_until) do
       {:ok, _member} ->
         escalator_level = Escalator.level_for(user_id)
         expiry_seconds = calculate_expiry(expiry_seconds, escalator_level, escalator_enabled)
@@ -243,7 +244,7 @@ defmodule Bolt.USW do
 
   @spec dm_user(Guild.id(), User.id()) :: :noop | {:ok, Message.t()} | Api.Error
   defp dm_user(guild_id, user_id) do
-    case Api.create_dm(user_id) do
+    case Api.User.create_dm(user_id) do
       {:ok, dm} ->
         guild_desc =
           case GuildCache.get(guild_id) do
@@ -254,7 +255,7 @@ defmodule Bolt.USW do
               guild_id
           end
 
-        Api.create_message(
+        Api.Message.create(
           dm.id,
           "you have been muted on `#{guild_desc}` for triggering " <>
             "a spam filter. contact a staff member for further information"

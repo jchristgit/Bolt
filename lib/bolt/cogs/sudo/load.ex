@@ -2,7 +2,7 @@ defmodule Bolt.Cogs.Sudo.Load do
   @moduledoc "Load a command."
 
   alias Nosedrum.TextCommand.Storage.ETS, as: CommandStorage
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
   alias Nostrum.Struct.User
   require Logger
 
@@ -38,7 +38,7 @@ defmodule Bolt.Cogs.Sudo.Load do
           end
       end
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, reply)
+    {:ok, _msg} = Message.create(msg.channel_id, reply)
   end
 
   def command(msg, _args) do
@@ -47,6 +47,6 @@ defmodule Bolt.Cogs.Sudo.Load do
     - `sudo load <command_name:str> <module:str>`
     """
 
-    {:ok, _msg} = Api.create_message(msg.channel_id, reply)
+    {:ok, _msg} = Message.create(msg.channel_id, reply)
   end
 end

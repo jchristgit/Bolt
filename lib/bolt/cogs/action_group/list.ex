@@ -6,7 +6,7 @@ defmodule Bolt.Cogs.ActionGroup.List do
   alias Bolt.Actions
   alias Bolt.Schema.ActionGroup
   alias Nosedrum.TextCommand.Predicates
-  alias Nostrum.Api
+  alias Nostrum.Api.Message
 
   @impl true
   def usage, do: ["ag list"]
@@ -27,12 +27,12 @@ defmodule Bolt.Cogs.ActionGroup.List do
   def command(msg, []) do
     groups = Actions.get_guild_groups(msg.guild_id)
     response = "__**Configured action groups**__\n#{format_groups(groups)}"
-    Api.create_message!(msg.channel_id, content: response, allowed_mentions: :none)
+    {:ok, _msg} = Message.create(msg.channel_id, content: response, allowed_mentions: :none)
   end
 
   def command(msg, _args) do
     response = "ℹ️ usage: `#{hd(usage())}`"
-    Api.create_message!(msg.channel_id, response)
+    {:ok, _msg} = Message.create(msg.channel_id, response)
   end
 
   defp format_groups([]) do
