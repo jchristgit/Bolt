@@ -14,12 +14,18 @@ defmodule Bolt.Application do
           term()
         ) :: {:ok, pid()} | {:ok, pid(), Application.state()} | {:error, term()}
   def start(_type, _args) do
+    bot_options = %{
+      consumer: Bolt.Consumer,
+      wrapped_token: fn -> Application.fetch_env!(:bolt, :token) end
+    }
     children = [
       # Manages the PostgreSQL connection.
       Bolt.Repo,
 
       # Handles timed events of infractions.
       {Bolt.Events.Handler, name: Bolt.Events.Handler},
+
+      # Stores our commands.
       Nosedrum.TextCommand.Storage.ETS,
 
       # Allows for embed pagination.
@@ -31,14 +37,14 @@ defmodule Bolt.Application do
       # Supervises the Uncomplicated Spam Wall processes.
       Bolt.USWSupervisor,
 
-      # Supervises bolt's auto-redact worker processes.
-      Bolt.Redact.Supervisor,
-
       # Manages the bolt <-> rrdtool connection.
       Bolt.RRD,
 
-      # Handles Discord Gateway events.
-      Bolt.Consumer
+      # Handles the Discord connection.
+      {Nostrum.Bot, {bot_options, []}},
+
+      # Supervises bolt's auto-redact worker processes.
+      Bolt.Redact.Supervisor,
     ]
 
     options = [strategy: :rest_for_one, name: Bolt.Supervisor]

@@ -15,7 +15,8 @@ config :bolt,
       {value, _} = Integer.parse(user_id)
       value
     end),
-  web_domain: System.get_env("WEB_DOMAIN")
+  web_domain: System.get_env("WEB_DOMAIN"),
+  token: System.get_env("BOT_TOKEN")
 
 config :crow,
   ip: {127, 0, 0, 1},
@@ -63,8 +64,9 @@ config :bolt, Bolt.Repo,
   url: System.get_env("PGSQL_URL")
 
 config :nostrum,
-  token: System.get_env("BOT_TOKEN"),
   request_guild_members: true,
+  youtubedl: false,
+  ffmpeg: false,
   caches: %{
     presences: Nostrum.Cache.PresenceCache.NoOp
   },

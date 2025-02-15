@@ -23,7 +23,7 @@ defmodule Bolt.Consumer do
     UserUpdate
   }
 
-  use Nostrum.Consumer
+  @behaviour Nostrum.Consumer
 
   @spec handle_event(Nostrum.Consumer.event()) :: any()
   def handle_event({:CHANNEL_CREATE, new_channel, _ws_state}) do
@@ -103,4 +103,6 @@ defmodule Bolt.Consumer do
   def handle_event({:USER_UPDATE, {old_user, new_user}, _ws_state}) do
     UserUpdate.handle(old_user, new_user)
   end
+
+  def handle_event(_), do: :ok
 end

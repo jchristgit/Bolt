@@ -13,7 +13,8 @@ if config_env() != :test do
         {value, _} = Integer.parse(user_id)
         value
       end),
-    web_domain: System.get_env("WEB_DOMAIN")
+    web_domain: System.get_env("WEB_DOMAIN"),
+    token: System.get_env("BOT_TOKEN")
 
   # STATE_DIRECTORY is exported by systemd when we set the `StateDirectory` option.
   case System.get_env("STATE_DIRECTORY") do
@@ -30,7 +31,4 @@ if config_env() != :test do
   config :bolt, Bolt.Repo,
     adapter: Ecto.Adapters.Postgres,
     url: System.get_env("PGSQL_URL")
-
-  config :nostrum,
-    token: System.get_env("BOT_TOKEN")
 end
