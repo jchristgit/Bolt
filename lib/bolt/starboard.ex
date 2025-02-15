@@ -36,7 +36,9 @@ defmodule Bolt.Starboard do
   @spec starboard_channel?(Guild.id(), Channel.id()) :: boolean()
   def starboard_channel?(guild_id, channel_id) do
     query =
-      from(sc in StarboardConfig, where: sc.guild_id == ^guild_id and sc.channel_id == ^channel_id)
+      from(sc in StarboardConfig,
+        where: sc.guild_id == ^guild_id and sc.channel_id == ^channel_id
+      )
 
     Repo.exists?(query)
   end
@@ -47,7 +49,9 @@ defmodule Bolt.Starboard do
   @spec delete_data(Guild.id(), Channel.id()) :: {non_neg_integer(), non_neg_integer()}
   def delete_data(guild_id, channel_id) do
     config_query =
-      from(sc in StarboardConfig, where: sc.guild_id == ^guild_id and sc.channel_id == ^channel_id)
+      from(sc in StarboardConfig,
+        where: sc.guild_id == ^guild_id and sc.channel_id == ^channel_id
+      )
 
     message_query =
       from(sm in StarboardMessage,
@@ -62,7 +66,12 @@ defmodule Bolt.Starboard do
   @doc """
   Create or update the starboard message for the given message & star count in the given starboard channel.
   """
-  @spec create_or_update_starboard_message(Channel.id(), Guild.id(), Struct.Message.t(), pos_integer()) ::
+  @spec create_or_update_starboard_message(
+          Channel.id(),
+          Guild.id(),
+          Struct.Message.t(),
+          pos_integer()
+        ) ::
           any()
   def create_or_update_starboard_message(starboard_channel_id, guild_id, message, star_count) do
     # Discord doesn't send us the guild_id in the message here, so add it ourselves.

@@ -35,7 +35,8 @@ defmodule Bolt.Cogs.ActionGroup.Create do
           "#{human_user(msg.author)} created action group `#{name}`"
         )
 
-        {:ok, _msg} = Message.create(msg.channel_id, "👌 group created, use `ag add` to add actions")
+        {:ok, _msg} =
+          Message.create(msg.channel_id, "👌 group created, use `ag add` to add actions")
 
       error ->
         response = ErrorFormatters.fmt(msg, error)

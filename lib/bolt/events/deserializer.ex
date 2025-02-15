@@ -8,7 +8,7 @@ defmodule Bolt.Events.Deserializer do
   alias Nostrum.Api.Guild
   require Logger
 
-  @spec deserialize(Infraction) :: (() -> any())
+  @spec deserialize(Infraction) :: (-> any())
   def deserialize(%Infraction{
         id: infraction_id,
         type: "temprole",

@@ -31,7 +31,7 @@ defmodule Bolt.Cogs.Infraction.Detail do
     embed
   end
 
-  @spec add_field_if(Embed.t(), boolean(), non_neg_integer(), (() -> Field.t())) :: Embed.t()
+  @spec add_field_if(Embed.t(), boolean(), non_neg_integer(), (-> Field.t())) :: Embed.t()
   defp add_field_if(embed, condition, index, field_func) do
     if condition do
       Map.put(

@@ -26,7 +26,8 @@ defmodule Bolt.Consumer.GuildMemberAdd do
     execute_join_actions(guild_id, member)
   end
 
-  @spec check_active_temprole(Struct.Guild.id(), Struct.Guild.Member.t()) :: :ignored | ModLog.on_emit()
+  @spec check_active_temprole(Struct.Guild.id(), Struct.Guild.Member.t()) ::
+          :ignored | ModLog.on_emit()
   defp check_active_temprole(guild_id, member) do
     query =
       from(

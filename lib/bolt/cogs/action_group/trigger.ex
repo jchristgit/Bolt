@@ -28,10 +28,11 @@ defmodule Bolt.Cogs.ActionGroup.Trigger do
   def command(msg, [name]) do
     case Actions.get_guild_group(msg.guild_id, name) do
       nil ->
-        {:ok, _msg} = Message.create(msg.channel_id,
-          content: "🚫 no action group named `#{name}` found",
-          allowed_mentions: :none
-        )
+        {:ok, _msg} =
+          Message.create(msg.channel_id,
+            content: "🚫 no action group named `#{name}` found",
+            allowed_mentions: :none
+          )
 
       group ->
         context = Actions.build_context(msg)

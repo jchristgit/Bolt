@@ -130,7 +130,8 @@ defmodule Bolt.Helpers do
   end
 
   @doc "Checks that `actor_id`'s top role is above `target_id`s top role on `guild_id`."
-  @spec above?(Struct.Guild.id(), User.id(), User.id()) :: {:ok, true | false} | {:error, String.t()}
+  @spec above?(Struct.Guild.id(), User.id(), User.id()) ::
+          {:ok, true | false} | {:error, String.t()}
   def above?(guild_id, actor_id, target_id) do
     case top_role_for(guild_id, actor_id) do
       {:ok, actor_top_role} ->

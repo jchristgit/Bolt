@@ -32,7 +32,7 @@ defmodule Bolt.USW do
     "NEWLINES" => &Rules.Newlines.apply/4
   }
 
-  @spec config_to_fn(Message.t(), USWRuleConfig) :: (() -> :action | :passthrough)
+  @spec config_to_fn(Message.t(), USWRuleConfig) :: (-> :action | :passthrough)
   defp config_to_fn(msg, config) do
     fn ->
       func = Map.fetch!(@filter_name_to_function, config.rule)
@@ -92,7 +92,7 @@ defmodule Bolt.USW do
   defp level_description(true, level), do: "- escalation level #{level}"
 
   @spec execute_config(USWPunishmentConfig, User.id(), String.t()) ::
-          (() -> {:ok, Message.t()} | Api.error() | :noop)
+          (-> {:ok, Message.t()} | Api.error() | :noop)
   defp execute_config(
          %USWPunishmentConfig{
            guild_id: guild_id,

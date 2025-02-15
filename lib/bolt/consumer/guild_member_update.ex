@@ -12,7 +12,11 @@ defmodule Bolt.Consumer.GuildMemberUpdate do
   alias Nostrum.Struct.Guild.Member
   import Ecto.Query, only: [from: 2]
 
-  @spec handle(guild_id :: Struct.Guild.id(), old_member :: Member.t() | nil, new_member :: Member.t()) ::
+  @spec handle(
+          guild_id :: Struct.Guild.id(),
+          old_member :: Member.t() | nil,
+          new_member :: Member.t()
+        ) ::
           ModLog.on_emit()
   def handle(guild_id, nil, new_member) do
     # If the original member state could not be fetched from
