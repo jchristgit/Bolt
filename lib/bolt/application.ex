@@ -16,8 +16,18 @@ defmodule Bolt.Application do
   def start(_type, _args) do
     bot_options = %{
       consumer: Bolt.Consumer,
+      intents: [
+        :direct_messages,
+        :guild_bans,
+        :guild_members,
+        :guild_message_reactions,
+        :guild_messages,
+        :guilds,
+        :message_content
+      ],
       wrapped_token: fn -> Application.fetch_env!(:bolt, :token) end
     }
+
     children = [
       # Manages the PostgreSQL connection.
       Bolt.Repo,
@@ -44,7 +54,7 @@ defmodule Bolt.Application do
       {Nostrum.Bot, {bot_options, []}},
 
       # Supervises bolt's auto-redact worker processes.
-      Bolt.Redact.Supervisor,
+      Bolt.Redact.Supervisor
     ]
 
     options = [strategy: :rest_for_one, name: Bolt.Supervisor]

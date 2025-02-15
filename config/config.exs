@@ -27,7 +27,7 @@ config :crow,
     CrowPlugins.BEAM.Atoms,
     CrowPlugins.BEAM.ContextSwitches,
     {CrowPlugins.BEAM.ETS,
-     name: 'nostrum_caches',
+     name: ~c"nostrum_caches",
      mode: :memory,
      tables: [
        :nostrum_users,
@@ -35,7 +35,7 @@ config :crow,
        :nostrum_guilds
      ]},
     {CrowPlugins.BEAM.ETS,
-     name: 'nostrum_caches',
+     name: ~c"nostrum_caches",
      mode: :items,
      tables: [
        :nostrum_users,
@@ -69,16 +69,7 @@ config :nostrum,
   ffmpeg: false,
   caches: %{
     presences: Nostrum.Cache.PresenceCache.NoOp
-  },
-  gateway_intents: [
-    :direct_messages,
-    :guild_bans,
-    :guild_members,
-    :guild_message_reactions,
-    :guild_messages,
-    :guilds,
-    :message_content
-  ]
+  }
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
