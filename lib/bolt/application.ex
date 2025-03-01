@@ -25,6 +25,7 @@ defmodule Bolt.Application do
         :guilds,
         :message_content
       ],
+      shards: :auto,
       wrapped_token: fn -> Application.fetch_env!(:bolt, :token) end
     }
 
@@ -51,7 +52,7 @@ defmodule Bolt.Application do
       Bolt.RRD,
 
       # Handles the Discord connection.
-      {Nostrum.Bot, {bot_options, []}},
+      {Nostrum.Bot, bot_options},
 
       # Supervises bolt's auto-redact worker processes.
       Bolt.Redact.Supervisor

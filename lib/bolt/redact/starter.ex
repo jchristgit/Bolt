@@ -5,7 +5,9 @@ defmodule Bolt.Redact.Starter do
   alias Bolt.Repo
   alias Bolt.Schema.RedactConfig
   alias Nostrum.ConsumerGroup
+  alias Nostrum.Token
   import Ecto.Query, only: [from: 2]
+  import Nostrum.Bot, only: [with_bot: 2]
   require Logger
   use GenServer, restart: :transient
 
@@ -18,32 +20,38 @@ defmodule Bolt.Redact.Starter do
   end
 
   def handle_continue(:ok, state) do
-    :ok = ConsumerGroup.join()
+    :bolt
+    |> Application.fetch_env(:token)
+    |> then(fn {:ok, token} -> token end)
+    |> Token.decode_token!()
+    |> with_bot(fn ->
+      :ok = ConsumerGroup.join()
 
-    receive do
-      {:event, {:READY, _, _}} -> :ok
-    after
-      10_000 -> :ok
-    end
+      receive do
+        {:event, {:READY, _, _}} -> :ok
+      after
+        10_000 -> :ok
+      end
 
-    :ok = :pg.leave(ConsumerGroup, :consumers, self())
-    # Make sure cache is actually full.... jesus christ, this is hacky
-    :timer.sleep(5_000)
+      :ok = ConsumerGroup.leave()
+      # Make sure cache is actually full.... jesus christ, this is hacky
+      :timer.sleep(5_000)
 
-    guild_ids_query =
-      from config in RedactConfig,
-        distinct: true,
-        select: config.guild_id
+      guild_ids_query =
+        from config in RedactConfig,
+          distinct: true,
+          select: config.guild_id
 
-    started =
-      guild_ids_query
-      |> Repo.all()
-      |> Stream.map(&fetch_and_start_guild_workers/1)
-      |> Enum.sum()
+      started =
+        guild_ids_query
+        |> Repo.all()
+        |> Stream.map(&fetch_and_start_guild_workers/1)
+        |> Enum.sum()
 
-    Logger.debug("Started #{started} redact workers")
+      Logger.debug("Started #{started} redact workers")
 
-    {:stop, :normal, state}
+      {:stop, :normal, state}
+    end)
   end
 
   defp fetch_and_start_guild_workers(guild_id) do
